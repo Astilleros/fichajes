@@ -10,7 +10,7 @@ import { CalendarService } from './calendar/calendar.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/fichajes_db'),
+    MongooseModule.forRoot('mongodb://127.0.0.1/fichajes_db'),
     AuthModule,
     UserModule,
     WorkersModule,
