@@ -20,7 +20,7 @@ import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('')
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.create(createUserDto);
   }
