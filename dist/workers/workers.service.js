@@ -155,6 +155,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             if (!e.start.dateTime || !e.end.dateTime)
                 continue;
             const start = new Date(e.start.dateTime);
+            if (!base[start.getDate()])
+                base[start.getDate()] = [];
             base[start.getDate()].push(e);
             if (base[start.getDate()].length > cols_events)
                 cols_events = base[start.getDate()].length;
