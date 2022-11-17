@@ -194,7 +194,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     let total_days = 0;
     for (let i = new Date(start).getDate(); i <= days; i++) {
       base[i] = [];
-    }
+    } 
 
     console.log(JSON.stringify(base, null, 2));
 
