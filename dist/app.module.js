@@ -16,6 +16,7 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./auth/auth.module");
 const calendar_service_1 = require("./calendar/calendar.service");
+const calendar_module_1 = require("./calendar/calendar.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -26,6 +27,7 @@ AppModule = __decorate([
             user_module_1.UserModule,
             workers_module_1.WorkersModule,
             tasks_module_1.TasksModule,
+            calendar_module_1.CalendarsModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, calendar_service_1.CalendarService],

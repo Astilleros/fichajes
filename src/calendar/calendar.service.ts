@@ -1,22 +1,12 @@
+/* eslint-disable prettier/prettier */
 import { google, calendar_v3 } from 'googleapis';
 import config from './config';
+import { Injectable } from '@nestjs/common';
 
-interface EventPrivateExtendedProperties {
-  type?: string;
-  code?: string;
-  contact?: string;
-  dossier?: string;
-  user?: string;
-  step?: string;
-  alert?: string;
-}
 
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const GOOGLE_PRIVATE_KEY = config.googleCalendar.private_key;
 const GOOGLE_CLIENT_EMAIL = config.googleCalendar.client_email;
-
-import { Injectable } from '@nestjs/common';
-import { MethodOptions } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
 @Injectable()
 export class CalendarService {
