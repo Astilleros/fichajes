@@ -1,4 +1,5 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { calendar_v3 } from 'googleapis';
 import { Model } from 'mongoose';
@@ -254,6 +255,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       startY: doc.lastAutoTable.finalY,
     });
     return doc.output();
+  }
+
+  //// CALENDAR
+  async getWorkerByCalendar(calendar: string){
+    const worker = await this.workerModel.findOne({calendar})
+    return worker
   }
 }
 

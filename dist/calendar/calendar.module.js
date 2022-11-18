@@ -10,11 +10,12 @@ exports.CalendarsModule = void 0;
 const common_1 = require("@nestjs/common");
 const calendar_service_1 = require("./calendar.service");
 const calendar_controller_1 = require("./calendar.controller");
+const workers_module_1 = require("../workers/workers.module");
 let CalendarsModule = class CalendarsModule {
 };
 CalendarsModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
+        imports: [workers_module_1.WorkersModule],
         controllers: [calendar_controller_1.CalendarController],
         providers: [calendar_service_1.CalendarService, calendar_service_1.CalendarService],
         exports: [calendar_service_1.CalendarService],

@@ -33,6 +33,9 @@ export class Worker {
 
   @Prop({ default: workerStatus.unlinked })
   status?: workerStatus;
+
+  @Prop({ default: new Date().toISOString() })
+  sync?: string;
 }
 
 export const WorkerSchema = SchemaFactory.createForClass(Worker);

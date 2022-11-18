@@ -12,10 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalendarService = void 0;
 const googleapis_1 = require("googleapis");
 const config_1 = require("./config");
+const common_1 = require("@nestjs/common");
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const GOOGLE_PRIVATE_KEY = config_1.default.googleCalendar.private_key;
 const GOOGLE_CLIENT_EMAIL = config_1.default.googleCalendar.client_email;
-const common_1 = require("@nestjs/common");
 let CalendarService = class CalendarService {
     constructor() {
         const auth = new googleapis_1.google.auth.JWT(GOOGLE_CLIENT_EMAIL, undefined, GOOGLE_PRIVATE_KEY, SCOPES);
@@ -28,9 +28,22 @@ let CalendarService = class CalendarService {
         const response = await this.client.calendarList.list();
         return response.data;
     }
+    async watchCalendarEvents(calendarId) {
+        console.log(calendarId);
+        const watchResponse = await this.client.events.watch({
+            requestBody: {
+                id: calendarId.replace('@', '-').replace(/\./g, '_'),
+                type: 'web_hook',
+                address: `https://ficfac.app/api/calendar/watch`,
+            },
+            calendarId,
+        });
+        console.log('watchResponse: ', watchResponse.data);
+    }
     async createCalendar(calendarData) {
         const requestBody = Object.assign(Object.assign({}, calendarData), { kind: 'calendar#calendarListEntry' });
         const response = await this.client.calendars.insert({ requestBody });
+        await this.watchCalendarEvents(response.data.id);
         return response.data;
     }
     async shareCalendar(calendarId, googleAccount, role = 'writer') {
@@ -103,6 +116,15 @@ let CalendarService = class CalendarService {
             requestBody,
         });
         return response.data;
+    }
+    async getChanges(calendarId, updatedMin) {
+        const options = {
+            calendarId,
+            updatedMin,
+            singleEvents: false
+        };
+        const response = await this.client.events.list(options);
+        return response.data.items;
     }
     async filterEvents(calendarId, timeMin, timeMax, maxResults) {
         const options = {

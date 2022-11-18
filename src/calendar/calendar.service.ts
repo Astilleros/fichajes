@@ -3,7 +3,6 @@ import { google, calendar_v3 } from 'googleapis';
 import config from './config';
 import { Injectable } from '@nestjs/common';
 
-
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const GOOGLE_PRIVATE_KEY = config.googleCalendar.private_key;
 const GOOGLE_CLIENT_EMAIL = config.googleCalendar.client_email;
@@ -31,9 +30,24 @@ export class CalendarService {
     return response.data;
   }
 
+  async watchCalendarEvents(calendarId: calendar_v3.Schema$Calendar['id']) {
+    console.log(calendarId);
+
+    const watchResponse = await this.client.events.watch({
+      requestBody: {
+        id: calendarId.replace('@', '-').replace(/\./g, '_'),
+        type: 'web_hook',
+        address: `https://ficfac.app/api/calendar/watch`,
+      },
+      calendarId,
+    });
+    console.log('watchResponse: ', watchResponse.data);
+  }
+
   async createCalendar(calendarData: calendar_v3.Schema$Calendar) {
     const requestBody = { ...calendarData, kind: 'calendar#calendarListEntry' };
     const response = await this.client.calendars.insert({ requestBody });
+    await this.watchCalendarEvents(response.data.id);
     return response.data;
   }
 
@@ -116,6 +130,16 @@ export class CalendarService {
       requestBody,
     });
     return response.data;
+  }
+
+  async getChanges(calendarId: string, updatedMin: string) {
+    const options: calendar_v3.Params$Resource$Events$List = {
+      calendarId,
+      updatedMin,
+      singleEvents: false
+    }
+    const response = await this.client.events.list(options);
+    return response.data.items;
   }
 
   async filterEvents(

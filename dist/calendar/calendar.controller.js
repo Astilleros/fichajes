@@ -14,27 +14,58 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalendarController = void 0;
 const common_1 = require("@nestjs/common");
+const status_enum_1 = require("../workers/dto/status.enum");
+const workers_service_1 = require("../workers/workers.service");
 const calendar_service_1 = require("./calendar.service");
 let CalendarController = class CalendarController {
-    constructor(calendarService) {
+    constructor(calendarService, workersService) {
         this.calendarService = calendarService;
+        this.workersService = workersService;
     }
-    create(req, data) {
-        console.log('watch: ', req.url, JSON.stringify(req.headers, null, 2), data);
+    async create(req) {
+        const status = req.headers['x-goog-resource-state'];
+        if (status != 'exists')
+            return;
+        const calendarId = req.headers['x-goog-channel-id']
+            .replace('-', '@')
+            .replace(/\_/g, '.');
+        const worker = await this.workersService.getWorkerByCalendar(calendarId);
+        const sync = new Date().toISOString();
+        const new_events = await this.calendarService.getChanges(calendarId, worker.sync);
+        for (let i = 0; i < new_events.length; i++) {
+            const e = new_events[i];
+            if (!e.start.date)
+                continue;
+            if (e.summary === '@vincular') {
+                if (worker.status === status_enum_1.workerStatus.pending) {
+                    await this.workersService.update(worker.user, worker._id, {
+                        status: status_enum_1.workerStatus.linked,
+                    });
+                    await this.calendarService.updateEvent(worker.calendar, e.id, {
+                        summary: 'Vinculado corectamente',
+                    });
+                }
+                else if (worker.status === status_enum_1.workerStatus.linked) {
+                    await this.calendarService.updateEvent(worker.calendar, e.id, {
+                        summary: 'Calendario ya vinculado.',
+                    });
+                }
+            }
+        }
+        await this.workersService.update(worker.user, worker._id, { sync });
     }
-    ;
 };
 __decorate([
     (0, common_1.Post)('watch'),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], CalendarController.prototype, "create", null);
 CalendarController = __decorate([
     (0, common_1.Controller)('calendar'),
-    __metadata("design:paramtypes", [calendar_service_1.CalendarService])
+    __metadata("design:paramtypes", [calendar_service_1.CalendarService,
+        workers_service_1.WorkersService])
 ], CalendarController);
 exports.CalendarController = CalendarController;
 //# sourceMappingURL=calendar.controller.js.map

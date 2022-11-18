@@ -50,6 +50,10 @@ __decorate([
     (0, mongoose_1.Prop)({ default: status_enum_1.workerStatus.unlinked }),
     __metadata("design:type", Number)
 ], Worker.prototype, "status", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: new Date().toISOString() }),
+    __metadata("design:type", String)
+], Worker.prototype, "sync", void 0);
 Worker = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })
 ], Worker);

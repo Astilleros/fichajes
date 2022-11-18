@@ -1,6 +1,8 @@
+import { WorkersService } from 'src/workers/workers.service';
 import { CalendarService } from './calendar.service';
 export declare class CalendarController {
     private readonly calendarService;
-    constructor(calendarService: CalendarService);
-    create(req: Request, data: any): void;
+    private readonly workersService;
+    constructor(calendarService: CalendarService, workersService: WorkersService);
+    create(req: Request): Promise<void>;
 }
