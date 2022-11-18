@@ -34,6 +34,6 @@ export declare class Worker {
     readonly mobile: string;
     calendar?: string;
     status?: workerStatus;
-    sync?: string;
+    sync: string;
 }
 export declare const WorkerSchema: import("mongoose").Schema<Worker, import("mongoose").Model<Worker, any, any, any, any>, {}, {}, {}, {}, "type", Worker>;

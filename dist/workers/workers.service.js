@@ -205,7 +205,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return doc.output();
     }
     async getWorkerByCalendar(calendar) {
-        const worker = await this.workerModel.findOne({ calendar });
+        const worker = await this.workerModel.findOne({ calendar }).exec();
         return worker;
     }
 };

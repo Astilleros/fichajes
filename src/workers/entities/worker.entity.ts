@@ -35,7 +35,7 @@ export class Worker {
   status?: workerStatus;
 
   @Prop({ default: new Date().toISOString() })
-  sync?: string;
+  sync: string;
 }
 
 export const WorkerSchema = SchemaFactory.createForClass(Worker);

@@ -30,6 +30,9 @@ let CalendarController = class CalendarController {
             .replace('-', '@')
             .replace(/\_/g, '.');
         const worker = await this.workersService.getWorkerByCalendar(calendarId);
+        if (!worker)
+            throw new Error('No encuentra en worker');
+        console.log(worker);
         const sync = new Date().toISOString();
         const new_events = await this.calendarService.getChanges(calendarId, worker.sync);
         for (let i = 0; i < new_events.length; i++) {
