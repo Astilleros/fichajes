@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilesController = void 0;
 const common_1 = require("@nestjs/common");
 const files_service_1 = require("./files.service");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let FilesController = class FilesController {
     constructor(filesService) {
         this.filesService = filesService;
@@ -38,7 +37,6 @@ __decorate([
 ], FilesController.prototype, "findOne", null);
 FilesController = __decorate([
     (0, common_1.Controller)('files'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [files_service_1.FilesService])
 ], FilesController);
 exports.FilesController = FilesController;
