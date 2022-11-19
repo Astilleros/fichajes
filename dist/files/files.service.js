@@ -22,11 +22,10 @@ let FilesService = class FilesService {
         this.FilesModel = FilesModel;
     }
     async create(filename, data) {
-        const file = new this.FilesModel({
+        const file = await this.FilesModel.create({
             filename,
             data,
         });
-        await file.save();
         return `https://ficfac.app/api/files/${file._id}`;
     }
     async findById(_id) {

@@ -10,11 +10,10 @@ export class FilesService {
   ) {}
 
   async create(filename: string, data: string): Promise<string> {
-    const file = new this.FilesModel({
+    const file = await this.FilesModel.create({
       filename,
       data,
     });
-    await file.save();
     return `https://ficfac.app/api/files/${file._id}`;
   }
 
