@@ -176,7 +176,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 }
                 const start_au = new Date(e.start.dateTime);
                 const end_au = new Date(e.end.dateTime);
-                row[i] = `${pad2z(start_au.getHours())}:${pad2z(start_au.getMinutes())} - ${pad2z(end_au.getHours())}:${pad2z(end_au.getMinutes())}`;
+                const s_h = e.start.dateTime.slice(11, 13);
+                const e_h = e.end.dateTime.slice(11, 13);
+                const s_m = e.start.dateTime.slice(14, 16);
+                const e_m = e.end.dateTime.slice(14, 16);
+                row[i] = `${s_h}:${s_m} - ${e_h}:${e_m}`;
                 hours += (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
                 total_hours +=
                     (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
