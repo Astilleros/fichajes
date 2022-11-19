@@ -25,7 +25,7 @@ let FilesController = class FilesController {
             return;
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="${file.filename}"`,
+            'Content-Disposition': `attachment; filename="${file.filename + '.pdf'}"`,
         });
         return res.send(file.data);
     }
