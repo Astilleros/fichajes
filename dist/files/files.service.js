@@ -35,6 +35,7 @@ let FilesService = class FilesService {
         const file = await this.FilesModel.findOne({ _id }).exec();
         if (!file)
             return file;
+        return file;
     }
 };
 FilesService = __decorate([

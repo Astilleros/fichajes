@@ -26,5 +26,6 @@ export class FilesService {
     if (!file) return file;
 /* 
     await this.FilesModel.deleteOne({ _id }); */
+    return file;
   }
 }
