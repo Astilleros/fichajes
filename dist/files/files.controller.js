@@ -19,20 +19,23 @@ let FilesController = class FilesController {
     constructor(filesService) {
         this.filesService = filesService;
     }
-    async findOne(id) {
+    async findOne(res, id) {
         const file = await this.filesService.findById(id);
         if (!file)
             return;
+        res.set({
+            'Content-Disposition': `attachment; filename="${file.filename}"`,
+        });
         return file.data;
     }
 };
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.Header)('Content-Type', 'application/pdf'),
-    (0, common_1.Header)('Content-Disposition', 'attachment; filename="package.pdf"'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Response)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], FilesController.prototype, "findOne", null);
 FilesController = __decorate([

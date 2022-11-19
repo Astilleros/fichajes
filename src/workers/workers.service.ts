@@ -292,11 +292,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async comandoMes(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
-    const reference = new Date(e.created);
+    const reference = new Date(e.start.date);
     const start = new Date(reference.getFullYear(), reference.getMonth(), 1);
     const end = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
-    console.log('comandoMes: ',start, end);
-    
+
     const pdf_data = await this.generatePdfToSign(
       {
         _id: worker.user,
@@ -305,13 +304,14 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       },
       worker._id,
       start.toISOString(),
-      end.toISOString()
+      end.toISOString(),
     );
-    console.log('pdf_data', pdf_data.length);
-    
-    const url = await this.FilesService.create(`ficfac_${start.toISOString()}`, pdf_data);
-    console.log('url', url);
-    
+
+    const url = await this.FilesService.create(
+      `ficfac_${start.toISOString()}`,
+      pdf_data,
+    );
+
     await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: 'Hoja generada',
       description: `Enlace de descarga de un uso: ${url}`,

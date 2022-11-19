@@ -1,6 +1,12 @@
-import { Controller, Get, Header, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Param,
+  UseGuards,
+  Response,
+} from '@nestjs/common';
 import { FilesService } from './files.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('files')
 export class FilesController {
@@ -8,10 +14,13 @@ export class FilesController {
 
   @Get(':id')
   @Header('Content-Type', 'application/pdf')
-  @Header('Content-Disposition', 'attachment; filename="package.pdf"')
-  async findOne(@Param('id') id: string) {
+  //@Header('Content-Disposition', 'attachment; filename="package.pdf"')
+  async findOne(@Response() res: any, @Param('id') id: string) {
     const file = await this.filesService.findById(id);
     if (!file) return;
+    res.set({
+      'Content-Disposition': `attachment; filename="${file.filename}"`,
+    });
     return file.data;
   }
 }
