@@ -25,10 +25,7 @@
 import { Document } from 'mongoose';
 export type FilesDocument = Files & Document;
 export declare class Files {
-    readonly _id: string;
     readonly filename: string;
     readonly data: string;
-    readonly expireDate: string;
-    readonly createdAt: string;
 }
 export declare const FilesSchema: import("mongoose").Schema<Files, import("mongoose").Model<Files, any, any, any, any>, {}, {}, {}, {}, "type", Files>;

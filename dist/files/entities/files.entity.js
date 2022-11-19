@@ -16,23 +16,11 @@ let Files = class Files {
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
-], Files.prototype, "_id", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
 ], Files.prototype, "filename", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Files.prototype, "data", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Files.prototype, "expireDate", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ default: new Date() }),
-    __metadata("design:type", String)
-], Files.prototype, "createdAt", void 0);
 Files = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })
 ], Files);

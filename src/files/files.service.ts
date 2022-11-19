@@ -10,11 +10,15 @@ export class FilesService {
   ) {}
 
   async create(filename: string, data: string): Promise<string> {
-    const file = await this.FilesModel.create({
+    console.log('FilesService.create', filename, data.length);
+    let file = new this.FilesModel({
       filename,
       data,
     });
-    return `https://ficfac.app/api/files/${file._id}`;
+    file = await file.save();
+    console.log('file', file._id);
+    
+    return `https://ficfac.app/api/files/${file?._id}`;
   }
 
   async findById(_id: string) {
