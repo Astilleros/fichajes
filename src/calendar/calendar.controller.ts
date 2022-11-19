@@ -12,19 +12,25 @@ export class CalendarController {
   ) {}
 
   @Post('watch')
-  async create(@Request() req: Request) {
+  async watch(@Request() req: Request) {
     const status = req.headers['x-goog-resource-state'];
     if (status != 'exists') return;
-
+    console.log('status',status);
+    
+    console.log(req.headers['x-goog-channel-id']);
     const calendarId = req.headers['x-goog-channel-id']
       .replace('-', '@')
       .replace(/\_/g, '.');
+    
+      console.log('replaced ',req.headers['x-goog-channel-id']);
 
     const worker = await this.workersService.getWorkerByCalendar(calendarId);
     if(!worker) throw new Error('No encuentra en worker')
-    console.log(worker);
+  console.log('worker',worker);
     
     const sync = new Date().toISOString();
+    console.log('sync', sync);
+    
     const new_events = await this.calendarService.getChanges(
       calendarId,
       worker.sync,
@@ -32,7 +38,9 @@ export class CalendarController {
 
     for (let i = 0; i < new_events.length; i++) {
       const e = new_events[i];
-      if (!e.start.date) continue;
+      console.log(e);
+      
+      if (!e.start?.date) continue;
 
       if (e.summary === '@vincular') {
         if (worker.status === workerStatus.pending) {

@@ -22,22 +22,28 @@ let CalendarController = class CalendarController {
         this.calendarService = calendarService;
         this.workersService = workersService;
     }
-    async create(req) {
+    async watch(req) {
+        var _a;
         const status = req.headers['x-goog-resource-state'];
         if (status != 'exists')
             return;
+        console.log('status', status);
+        console.log(req.headers['x-goog-channel-id']);
         const calendarId = req.headers['x-goog-channel-id']
             .replace('-', '@')
             .replace(/\_/g, '.');
+        console.log('replaced ', req.headers['x-goog-channel-id']);
         const worker = await this.workersService.getWorkerByCalendar(calendarId);
         if (!worker)
             throw new Error('No encuentra en worker');
-        console.log(worker);
+        console.log('worker', worker);
         const sync = new Date().toISOString();
+        console.log('sync', sync);
         const new_events = await this.calendarService.getChanges(calendarId, worker.sync);
         for (let i = 0; i < new_events.length; i++) {
             const e = new_events[i];
-            if (!e.start.date)
+            console.log(e);
+            if (!((_a = e.start) === null || _a === void 0 ? void 0 : _a.date))
                 continue;
             if (e.summary === '@vincular') {
                 if (worker.status === status_enum_1.workerStatus.pending) {
@@ -64,7 +70,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], CalendarController.prototype, "create", null);
+], CalendarController.prototype, "watch", null);
 CalendarController = __decorate([
     (0, common_1.Controller)('calendar'),
     __metadata("design:paramtypes", [calendar_service_1.CalendarService,

@@ -4,5 +4,5 @@ export declare class CalendarController {
     private readonly calendarService;
     private readonly workersService;
     constructor(calendarService: CalendarService, workersService: WorkersService);
-    create(req: Request): Promise<void>;
+    watch(req: Request): Promise<void>;
 }
