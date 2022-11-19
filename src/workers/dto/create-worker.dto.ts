@@ -1,3 +1,4 @@
+import { workerModes } from './mode.enum';
 import { workerStatus } from './status.enum';
 
 export class CreateWorkerDto {
@@ -8,4 +9,5 @@ export class CreateWorkerDto {
   readonly mobile: string;
   readonly status: workerStatus;
   readonly sync: string;
+  readonly mode: workerModes
 }

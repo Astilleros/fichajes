@@ -39,23 +39,7 @@ export class CalendarController {
     for (let i = 0; i < new_events.length; i++) {
       const e = new_events[i];
       console.log(e);
-      
-      if (!e.start?.date) continue;
-
-      if (e.summary === '@vincular') {
-        if (worker.status === workerStatus.pending) {
-          await this.workersService.update(worker.user, worker._id, {
-            status: workerStatus.linked,
-          });
-          await this.calendarService.patchEvent(worker.calendar, e.id, {
-            summary: 'Vinculado corectamente',
-          });
-        } else if (worker.status === workerStatus.linked) {
-          await this.calendarService.patchEvent(worker.calendar, e.id, {
-            summary: 'Calendario ya vinculado.',
-          });
-        }
-      }
+      this.workersService.watchEvent(worker, e)
     }
 
     await this.workersService.update(worker.user, worker._id, { sync });

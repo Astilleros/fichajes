@@ -14,7 +14,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalendarController = void 0;
 const common_1 = require("@nestjs/common");
-const status_enum_1 = require("../workers/dto/status.enum");
 const workers_service_1 = require("../workers/workers.service");
 const calendar_service_1 = require("./calendar.service");
 let CalendarController = class CalendarController {
@@ -23,7 +22,6 @@ let CalendarController = class CalendarController {
         this.workersService = workersService;
     }
     async watch(req) {
-        var _a;
         const status = req.headers['x-goog-resource-state'];
         if (status != 'exists')
             return;
@@ -43,23 +41,7 @@ let CalendarController = class CalendarController {
         for (let i = 0; i < new_events.length; i++) {
             const e = new_events[i];
             console.log(e);
-            if (!((_a = e.start) === null || _a === void 0 ? void 0 : _a.date))
-                continue;
-            if (e.summary === '@vincular') {
-                if (worker.status === status_enum_1.workerStatus.pending) {
-                    await this.workersService.update(worker.user, worker._id, {
-                        status: status_enum_1.workerStatus.linked,
-                    });
-                    await this.calendarService.patchEvent(worker.calendar, e.id, {
-                        summary: 'Vinculado corectamente',
-                    });
-                }
-                else if (worker.status === status_enum_1.workerStatus.linked) {
-                    await this.calendarService.patchEvent(worker.calendar, e.id, {
-                        summary: 'Calendario ya vinculado.',
-                    });
-                }
-            }
+            this.workersService.watchEvent(worker, e);
         }
         await this.workersService.update(worker.user, worker._id, { sync });
     }

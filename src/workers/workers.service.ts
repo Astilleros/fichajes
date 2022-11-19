@@ -12,12 +12,14 @@ import { Worker, WorkerDocument } from './entities/worker.entity';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { UserService } from 'src/user/user.service';
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class WorkersService {
   constructor(
     @InjectModel(Worker.name) private workerModel: Model<WorkerDocument>,
     private calendarService: CalendarService,
+    private FilesService: FilesService,
     private userService: UserService,
   ) {}
 
@@ -46,7 +48,7 @@ export class WorkersService {
     start: string,
     end: string,
   ): Promise<calendar_v3.Schema$Event[]> {
-    let w: WorkerDocument = await this.workerModel
+    const w: WorkerDocument = await this.workerModel
       .findOne({ _id: worker_id, user: user._id })
       .exec();
     if (!w) throw new Error('Trabajador no encontrado');
@@ -56,14 +58,6 @@ export class WorkersService {
       end,
       400,
     );
-
-    if (w.status === workerStatus.pending && events.length) {
-      w = await this.workerModel.findOneAndUpdate(
-        { _id: w._id },
-        { status: workerStatus.linked },
-        { new: true },
-      );
-    }
 
     return events;
   }
@@ -262,8 +256,65 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     const worker = await this.workerModel.findOne({ calendar }).exec();
     return worker;
   }
+
+  async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    if (!e.start?.date) return; // NO ES UN COMANDO
+    if (e.summary === '@vincular') return this.comandoVincular(worker, e);
+    if (e.summary === '@desvincular') return this.comandoDesvincular(worker, e);
+    if (e.summary === '@mes') return this.comandoMes(worker, e);
+  }
+
+  async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    if (worker.status === workerStatus.pending) {
+      await this.update(worker.user, worker._id, {
+        status: workerStatus.linked,
+      });
+      await this.calendarService.patchEvent(worker.calendar, e.id, {
+        summary: 'Vinculado corectamente',
+      });
+    }
+    if (worker.status === workerStatus.linked) {
+      await this.calendarService.patchEvent(worker.calendar, e.id, {
+        summary: 'Calendario ya vinculado.',
+      });
+    }
+  }
+
+  async comandoDesvincular(
+    worker: WorkerDocument,
+    e: calendar_v3.Schema$Event,
+  ) {
+    await this.unshareCalendar(worker.user, worker._id);
+
+    await this.calendarService.patchEvent(worker.calendar, e.id, {
+      summary: 'Calendario desvinculado',
+    });
+  }
+
+  async comandoMes(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    const reference = new Date(e.created);
+    const start = new Date(reference.getFullYear(), reference.getMonth(), 1);
+    const end = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
+
+    const pdf_data = await this.generatePdfToSign(
+      {
+        _id: worker.user,
+        username: '',
+        email: '',
+      },
+      worker._id,
+      start.toISOString(),
+      end.toISOString()
+    );
+    const url = await this.FilesService.create(`ficfac_${start.toISOString()}`, pdf_data);
+    await this.calendarService.patchEvent(worker.calendar, e.id, {
+      summary: 'Hoja generada',
+      description: `Enlace de descarga de un uso: ${url}`,
+    });
+  }
 }
 
+// HELPS.... DELETE
 const pad2z = (data: any) => {
   return String(data).padStart(2, '0');
 };

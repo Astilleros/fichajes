@@ -22,20 +22,13 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Document } from 'mongoose';
-import { workerModes } from '../dto/mode.enum';
-import { workerStatus } from '../dto/status.enum';
-export type WorkerDocument = Worker & Document;
-export declare class Worker {
-    readonly user: string;
-    readonly name: string;
-    readonly dni: string;
-    readonly seguridad_social: string;
-    readonly email: string;
-    readonly mobile: string;
-    calendar?: string;
-    status?: workerStatus;
-    sync: string;
-    mode: workerModes;
+import { Model } from 'mongoose';
+import { Files, FilesDocument } from './entities/files.entity';
+export declare class FilesService {
+    private FilesModel;
+    constructor(FilesModel: Model<FilesDocument>);
+    create(filename: string, data: string): Promise<string>;
+    findById(_id: string): Promise<Files & import("mongoose").Document<any, any, any> & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
 }
-export declare const WorkerSchema: import("mongoose").Schema<Worker, import("mongoose").Model<Worker, any, any, any, any>, {}, {}, {}, {}, "type", Worker>;

@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { CalendarService } from './calendar/calendar.service';
 import { CalendarsModule } from './calendar/calendar.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { CalendarsModule } from './calendar/calendar.module';
     UserModule,
     WorkersModule,
     TasksModule,
-    CalendarsModule
+    CalendarsModule,
+    FilesModule
   ],
   controllers: [AppController],
   providers: [AppService, CalendarService],

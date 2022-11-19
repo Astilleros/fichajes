@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { workerModes } from '../dto/mode.enum';
 import { workerStatus } from '../dto/status.enum';
 
 export type WorkerDocument = Worker & Document;
@@ -36,6 +37,9 @@ export class Worker {
 
   @Prop({ default: new Date().toISOString() })
   sync: string;
+
+  @Prop({ enum: workerModes, default: workerModes.none})
+  mode: workerModes
 }
 
 export const WorkerSchema = SchemaFactory.createForClass(Worker);

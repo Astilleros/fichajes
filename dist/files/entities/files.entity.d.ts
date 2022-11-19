@@ -23,19 +23,12 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Document } from 'mongoose';
-import { workerModes } from '../dto/mode.enum';
-import { workerStatus } from '../dto/status.enum';
-export type WorkerDocument = Worker & Document;
-export declare class Worker {
-    readonly user: string;
-    readonly name: string;
-    readonly dni: string;
-    readonly seguridad_social: string;
-    readonly email: string;
-    readonly mobile: string;
-    calendar?: string;
-    status?: workerStatus;
-    sync: string;
-    mode: workerModes;
+export type FilesDocument = Files & Document;
+export declare class Files {
+    readonly _id: string;
+    readonly filename: string;
+    readonly data: string;
+    readonly expireDate: string;
+    readonly createdAt: string;
 }
-export declare const WorkerSchema: import("mongoose").Schema<Worker, import("mongoose").Model<Worker, any, any, any, any>, {}, {}, {}, {}, "type", Worker>;
+export declare const FilesSchema: import("mongoose").Schema<Files, import("mongoose").Model<Files, any, any, any, any>, {}, {}, {}, {}, "type", Files>;

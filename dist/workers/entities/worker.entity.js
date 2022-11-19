@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkerSchema = exports.Worker = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mode_enum_1 = require("../dto/mode.enum");
 const status_enum_1 = require("../dto/status.enum");
 let Worker = class Worker {
 };
@@ -54,6 +55,10 @@ __decorate([
     (0, mongoose_1.Prop)({ default: new Date().toISOString() }),
     __metadata("design:type", String)
 ], Worker.prototype, "sync", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ enum: mode_enum_1.workerModes, default: mode_enum_1.workerModes.none }),
+    __metadata("design:type", Number)
+], Worker.prototype, "mode", void 0);
 Worker = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })
 ], Worker);

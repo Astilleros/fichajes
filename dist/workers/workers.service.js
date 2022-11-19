@@ -22,10 +22,12 @@ const worker_entity_1 = require("./entities/worker.entity");
 const jspdf_1 = require("jspdf");
 const jspdf_autotable_1 = require("jspdf-autotable");
 const user_service_1 = require("../user/user.service");
+const files_service_1 = require("../files/files.service");
 let WorkersService = class WorkersService {
-    constructor(workerModel, calendarService, userService) {
+    constructor(workerModel, calendarService, FilesService, userService) {
         this.workerModel = workerModel;
         this.calendarService = calendarService;
+        this.FilesService = FilesService;
         this.userService = userService;
     }
     async create(createWorkerDto) {
@@ -46,15 +48,12 @@ let WorkersService = class WorkersService {
         return workers;
     }
     async filterEvents(user, worker_id, start, end) {
-        let w = await this.workerModel
+        const w = await this.workerModel
             .findOne({ _id: worker_id, user: user._id })
             .exec();
         if (!w)
             throw new Error('Trabajador no encontrado');
         const events = await this.calendarService.filterEvents(w.calendar, start, end, 400);
-        if (w.status === status_enum_1.workerStatus.pending && events.length) {
-            w = await this.workerModel.findOneAndUpdate({ _id: w._id }, { status: status_enum_1.workerStatus.linked }, { new: true });
-        }
         return events;
     }
     findOne(user_id, _id) {
@@ -208,12 +207,60 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         const worker = await this.workerModel.findOne({ calendar }).exec();
         return worker;
     }
+    async watchEvent(worker, e) {
+        var _a;
+        if (!((_a = e.start) === null || _a === void 0 ? void 0 : _a.date))
+            return;
+        if (e.summary === '@vincular')
+            return this.comandoVincular(worker, e);
+        if (e.summary === '@desvincular')
+            return this.comandoDesvincular(worker, e);
+        if (e.summary === '@mes')
+            return this.comandoMes(worker, e);
+    }
+    async comandoVincular(worker, e) {
+        if (worker.status === status_enum_1.workerStatus.pending) {
+            await this.update(worker.user, worker._id, {
+                status: status_enum_1.workerStatus.linked,
+            });
+            await this.calendarService.patchEvent(worker.calendar, e.id, {
+                summary: 'Vinculado corectamente',
+            });
+        }
+        if (worker.status === status_enum_1.workerStatus.linked) {
+            await this.calendarService.patchEvent(worker.calendar, e.id, {
+                summary: 'Calendario ya vinculado.',
+            });
+        }
+    }
+    async comandoDesvincular(worker, e) {
+        await this.unshareCalendar(worker.user, worker._id);
+        await this.calendarService.patchEvent(worker.calendar, e.id, {
+            summary: 'Calendario desvinculado',
+        });
+    }
+    async comandoMes(worker, e) {
+        const reference = new Date(e.created);
+        const start = new Date(reference.getFullYear(), reference.getMonth(), 1);
+        const end = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
+        const pdf_data = await this.generatePdfToSign({
+            _id: worker.user,
+            username: '',
+            email: '',
+        }, worker._id, start.toISOString(), end.toISOString());
+        const url = await this.FilesService.create(`ficfac_${start.toISOString()}`, pdf_data);
+        await this.calendarService.patchEvent(worker.calendar, e.id, {
+            summary: 'Hoja generada',
+            description: `Enlace de descarga de un uso: ${url}`,
+        });
+    }
 };
 WorkersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(worker_entity_1.Worker.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         calendar_service_1.CalendarService,
+        files_service_1.FilesService,
         user_service_1.UserService])
 ], WorkersService);
 exports.WorkersService = WorkersService;

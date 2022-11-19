@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const worker_entity_1 = require("./entities/worker.entity");
 const calendar_service_1 = require("../calendar/calendar.service");
 const user_module_1 = require("../user/user.module");
+const files_module_1 = require("../files/files.module");
 let WorkersModule = class WorkersModule {
 };
 WorkersModule = __decorate([
@@ -21,6 +22,7 @@ WorkersModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: worker_entity_1.Worker.name, schema: worker_entity_1.WorkerSchema }]),
             user_module_1.UserModule,
+            files_module_1.FilesModule,
         ],
         controllers: [workers_controller_1.WorkersController],
         providers: [workers_service_1.WorkersService, calendar_service_1.CalendarService],
