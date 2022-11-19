@@ -24,15 +24,15 @@ let FilesController = class FilesController {
         if (!file)
             return;
         res.set({
+            'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename="${file.filename}"`,
         });
-        return file.data;
+        return res.send(file.data);
     }
 };
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, common_1.Header)('Content-Type', 'application/pdf'),
-    __param(0, (0, common_1.Response)()),
+    __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),

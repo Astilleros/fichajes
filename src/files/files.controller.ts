@@ -1,26 +1,19 @@
-import {
-  Controller,
-  Get,
-  Header,
-  Param,
-  UseGuards,
-  Response,
-} from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { FilesService } from './files.service';
+import { Response } from 'express';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get(':id')
-  @Header('Content-Type', 'application/pdf')
-  //@Header('Content-Disposition', 'attachment; filename="package.pdf"')
-  async findOne(@Response() res: any, @Param('id') id: string) {
+  async findOne(@Res() res: Response, @Param('id') id: string) {
     const file = await this.filesService.findById(id);
     if (!file) return;
     res.set({
+      'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="${file.filename}"`,
     });
-    return file.data;
+    return res.send(file.data);
   }
 }
