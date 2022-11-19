@@ -17,4 +17,5 @@ export declare class CalendarService {
     filterEvents(calendarId: string, timeMin?: string, timeMax?: string, maxResults?: number): Promise<calendar_v3.Schema$Event[]>;
     deleteEvent(calendarId: string, eventId: string): Promise<void>;
     updateEvent(calendarId: string, eventId: string, eventData: calendar_v3.Schema$Event): Promise<calendar_v3.Schema$Event>;
+    patchEvent(calendarId: string, eventId: string, eventData: calendar_v3.Schema$Event): Promise<calendar_v3.Schema$Event>;
 }

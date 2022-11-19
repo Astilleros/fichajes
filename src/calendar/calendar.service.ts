@@ -178,4 +178,18 @@ export class CalendarService {
     });
     return response.data;
   }
+
+  async patchEvent(
+    calendarId: string,
+    eventId: string,
+    eventData: calendar_v3.Schema$Event,
+  ) {
+    const requestBody = { ...eventData, kind: 'calendar#calendarListEntry' };
+    const response = await this.client.events.patch({
+      calendarId,
+      eventId,
+      requestBody,
+    });
+    return response.data;
+  }
 }

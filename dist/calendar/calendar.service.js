@@ -151,6 +151,15 @@ let CalendarService = class CalendarService {
         });
         return response.data;
     }
+    async patchEvent(calendarId, eventId, eventData) {
+        const requestBody = Object.assign(Object.assign({}, eventData), { kind: 'calendar#calendarListEntry' });
+        const response = await this.client.events.patch({
+            calendarId,
+            eventId,
+            requestBody,
+        });
+        return response.data;
+    }
 };
 CalendarService = __decorate([
     (0, common_1.Injectable)(),

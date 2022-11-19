@@ -47,11 +47,11 @@ export class CalendarController {
           await this.workersService.update(worker.user, worker._id, {
             status: workerStatus.linked,
           });
-          await this.calendarService.updateEvent(worker.calendar, e.id, {
+          await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Vinculado corectamente',
           });
         } else if (worker.status === workerStatus.linked) {
-          await this.calendarService.updateEvent(worker.calendar, e.id, {
+          await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Calendario ya vinculado.',
           });
         }
