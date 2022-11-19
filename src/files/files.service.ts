@@ -24,8 +24,8 @@ export class FilesService {
   async findById(_id: string) {
     const file = await this.FilesModel.findOne({ _id }).exec();
     if (!file) return file;
-/* 
-    await this.FilesModel.deleteOne({ _id }); */
+ 
+    await this.FilesModel.deleteOne({ _id }); 
     return file;
   }
 }
