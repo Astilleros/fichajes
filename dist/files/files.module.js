@@ -10,6 +10,7 @@ exports.FilesModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const files_entity_1 = require("./entities/files.entity");
+const files_controller_1 = require("./files.controller");
 const files_service_1 = require("./files.service");
 let FilesModule = class FilesModule {
 };
@@ -18,7 +19,7 @@ FilesModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: files_entity_1.Files.name, schema: files_entity_1.FilesSchema }]),
         ],
-        controllers: [],
+        controllers: [files_controller_1.FilesController],
         providers: [files_service_1.FilesService],
         exports: [files_service_1.FilesService]
     })
