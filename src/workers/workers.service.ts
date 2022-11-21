@@ -13,6 +13,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { UserService } from 'src/user/user.service';
 import { FilesService } from 'src/files/files.service';
+import { CheckinService } from 'src/checkin/checkin.service';
 
 @Injectable()
 export class WorkersService {
@@ -21,6 +22,7 @@ export class WorkersService {
     private calendarService: CalendarService,
     private FilesService: FilesService,
     private userService: UserService,
+    private CheckinService: CheckinService,
   ) {}
 
   async create(createWorkerDto: Worker): Promise<ListWorkerDto> {
@@ -219,10 +221,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         }
         const start_au = new Date(e.start.dateTime);
         const end_au = new Date(e.end.dateTime);
-        const s_h = e.start.dateTime.slice(11, 13)
-        const e_h = e.end.dateTime.slice(11, 13)
-        const s_m = e.start.dateTime.slice(14, 16)
-        const e_m = e.end.dateTime.slice(14, 16)
+        const s_h = e.start.dateTime.slice(11, 13);
+        const e_h = e.end.dateTime.slice(11, 13);
+        const s_m = e.start.dateTime.slice(14, 16);
+        const e_m = e.end.dateTime.slice(14, 16);
         row[i] = `${s_h}:${s_m} - ${e_h}:${e_m}`;
         hours += (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
         total_hours +=
@@ -264,6 +266,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     if (e.summary === '@vincular') return this.comandoVincular(worker, e);
     if (e.summary === '@desvincular') return this.comandoDesvincular(worker, e);
     if (e.summary === '@mes') return this.comandoMes(worker, e);
+    if (e.summary === '@checkin') return this.comandoCheckin(worker, e);
+    if (e.summary === '@checkout') return this.comandoCheckout(worker, e);
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
@@ -318,6 +322,61 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       summary: 'Hoja generada',
       description: `Enlace de descarga de un uso: ${url}`,
     });
+  }
+
+  async comandoCheckin(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    // Comprobar no hayan entrado ya.
+    const needCheckout = await this.CheckinService.findByWorker(worker._id);
+    if(needCheckout) {
+      await this.calendarService.patchEvent(worker.calendar, e.id, {
+        summary: '¿Olvidaste fichar la última salida? @checkout pendiente.',
+        description: `Estas intentando fichar una nueva entrada sin haber cerrado el anterior registro de entrada. 
+        Realiza antes un @checkout para poder hacer @checkin nuevamente.`,
+      });
+    }
+    // Crear nueva entrada
+    const date = new Date().toISOString()
+    const checkin = await this.CheckinService.create({
+      worker: worker._id,
+      calendar: worker.calendar,
+      date,
+      event: e.id
+    })
+    if(!checkin) throw new Error(`Imposible crear registro de entrada del trabajador: ${worker.name}`)
+    
+    await this.calendarService.patchEvent(worker.calendar, e.id, {
+      summary: `Checkin abierto a las ${date}`,
+      description: `Recuerda hacer @checkout para registrar la hora de finalización de periodo y registrar la jornada.`,
+    });
+
+    return checkin
+  }
+
+  async comandoCheckout(worker: WorkerDocument, e: calendar_v3.Schema$Event){
+    // Comprobar que hayan checkin.
+    const checkin = await this.CheckinService.findByWorker(worker._id);
+    if(!checkin) {
+      await this.calendarService.patchEvent(worker.calendar, e.id, {
+        summary: '¿Olvidaste fichar la última entrada?',
+        description: `Si olvidaste registrar la hora de comiendo de periodo con @checkin, sigue los siguientes pasos:
+        Primero, registra el @checkin y haz el @checkout normalmente.
+        Segundo, si no tienes el modo libre habilitado, haz click en el registro generado y envia un email a recursos humanos con el boton de envio de canvios.`,
+      });
+    }
+
+    await this.calendarService.deleteEvent(worker.calendar, checkin.event)
+
+    await this.calendarService.createEvent(worker.calendar, {
+      summary: '',
+      description: '',
+      start: {
+        dateTime: checkin.date,
+      },
+      end: {
+        dateTime: new Date().toISOString()
+      }
+    })
+
   }
 }
 

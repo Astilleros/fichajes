@@ -12,37 +12,32 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FilesService = void 0;
+exports.CheckinService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const files_entity_1 = require("./entities/files.entity");
-let FilesService = class FilesService {
-    constructor(FilesModel) {
-        this.FilesModel = FilesModel;
+const checkin_entity_1 = require("./entities/checkin.entity");
+let CheckinService = class CheckinService {
+    constructor(CheckinModel) {
+        this.CheckinModel = CheckinModel;
     }
-    async create(filename, data) {
-        console.log('FilesService.create', filename, data.length);
-        let file = new this.FilesModel({
-            filename,
-            data,
-        });
-        file = await file.save();
-        console.log('file', file._id);
-        return `https://ficfac.app/api/files/${file === null || file === void 0 ? void 0 : file._id}`;
+    async create(checkinDate) {
+        const checkin = new this.CheckinModel(checkinDate);
+        await checkin.save();
+        return checkin;
     }
-    async findById(_id) {
-        const file = await this.FilesModel.findOne({ _id }).exec();
-        if (!file)
-            return file;
-        await this.FilesModel.deleteOne({ _id });
-        return file;
+    async findByWorker(worker) {
+        const checkin = await this.CheckinModel.findOne({ worker }).exec();
+        return checkin;
+    }
+    async delete(_id) {
+        await this.CheckinModel.deleteOne({ _id }).exec();
     }
 };
-FilesService = __decorate([
+CheckinService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(files_entity_1.Files.name)),
+    __param(0, (0, mongoose_1.InjectModel)(checkin_entity_1.Checkin.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
-], FilesService);
-exports.FilesService = FilesService;
-//# sourceMappingURL=files.service.js.map
+], CheckinService);
+exports.CheckinService = CheckinService;
+//# sourceMappingURL=checkin.service.js.map

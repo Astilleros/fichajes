@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { CalendarService } from './calendar/calendar.service';
 import { CalendarsModule } from './calendar/calendar.module';
 import { FilesModule } from './files/files.module';
+import { SignModule } from './sign/sign.module';
+import { CheckinModule } from './checkin/checkin.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { FilesModule } from './files/files.module';
     WorkersModule,
     TasksModule,
     CalendarsModule,
-    FilesModule
+    FilesModule,
+    SignModule,
+    CheckinModule
   ],
   controllers: [AppController],
   providers: [AppService, CalendarService],

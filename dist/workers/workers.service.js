@@ -23,12 +23,14 @@ const jspdf_1 = require("jspdf");
 const jspdf_autotable_1 = require("jspdf-autotable");
 const user_service_1 = require("../user/user.service");
 const files_service_1 = require("../files/files.service");
+const checkin_service_1 = require("../checkin/checkin.service");
 let WorkersService = class WorkersService {
-    constructor(workerModel, calendarService, FilesService, userService) {
+    constructor(workerModel, calendarService, FilesService, userService, CheckinService) {
         this.workerModel = workerModel;
         this.calendarService = calendarService;
         this.FilesService = FilesService;
         this.userService = userService;
+        this.CheckinService = CheckinService;
     }
     async create(createWorkerDto) {
         const createdWorker = new this.workerModel(createWorkerDto);
@@ -221,6 +223,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             return this.comandoDesvincular(worker, e);
         if (e.summary === '@mes')
             return this.comandoMes(worker, e);
+        if (e.summary === '@checkin')
+            return this.comandoCheckin(worker, e);
+        if (e.summary === '@checkout')
+            return this.comandoCheckout(worker, e);
     }
     async comandoVincular(worker, e) {
         if (worker.status === status_enum_1.workerStatus.pending) {
@@ -258,6 +264,52 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             description: `Enlace de descarga de un uso: ${url}`,
         });
     }
+    async comandoCheckin(worker, e) {
+        const needCheckout = await this.CheckinService.findByWorker(worker._id);
+        if (needCheckout) {
+            await this.calendarService.patchEvent(worker.calendar, e.id, {
+                summary: '¿Olvidaste fichar la última salida? @checkout pendiente.',
+                description: `Estas intentando fichar una nueva entrada sin haber cerrado el anterior registro de entrada. 
+        Realiza antes un @checkout para poder hacer @checkin nuevamente.`,
+            });
+        }
+        const date = new Date().toISOString();
+        const checkin = await this.CheckinService.create({
+            worker: worker._id,
+            calendar: worker.calendar,
+            date,
+            event: e.id
+        });
+        if (!checkin)
+            throw new Error(`Imposible crear registro de entrada del trabajador: ${worker.name}`);
+        await this.calendarService.patchEvent(worker.calendar, e.id, {
+            summary: `Checkin abierto a las ${date}`,
+            description: `Recuerda hacer @checkout para registrar la hora de finalización de periodo y registrar la jornada.`,
+        });
+        return checkin;
+    }
+    async comandoCheckout(worker, e) {
+        const checkin = await this.CheckinService.findByWorker(worker._id);
+        if (!checkin) {
+            await this.calendarService.patchEvent(worker.calendar, e.id, {
+                summary: '¿Olvidaste fichar la última entrada?',
+                description: `Si olvidaste registrar la hora de comiendo de periodo con @checkin, sigue los siguientes pasos:
+        Primero, registra el @checkin y haz el @checkout normalmente.
+        Segundo, si no tienes el modo libre habilitado, haz click en el registro generado y envia un email a recursos humanos con el boton de envio de canvios.`,
+            });
+        }
+        await this.calendarService.deleteEvent(worker.calendar, checkin.event);
+        await this.calendarService.createEvent(worker.calendar, {
+            summary: '',
+            description: '',
+            start: {
+                dateTime: checkin.date,
+            },
+            end: {
+                dateTime: new Date().toISOString()
+            }
+        });
+    }
 };
 WorkersService = __decorate([
     (0, common_1.Injectable)(),
@@ -265,7 +317,8 @@ WorkersService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model,
         calendar_service_1.CalendarService,
         files_service_1.FilesService,
-        user_service_1.UserService])
+        user_service_1.UserService,
+        checkin_service_1.CheckinService])
 ], WorkersService);
 exports.WorkersService = WorkersService;
 const pad2z = (data) => {

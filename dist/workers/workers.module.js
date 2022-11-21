@@ -15,6 +15,7 @@ const worker_entity_1 = require("./entities/worker.entity");
 const calendar_service_1 = require("../calendar/calendar.service");
 const user_module_1 = require("../user/user.module");
 const files_module_1 = require("../files/files.module");
+const checkin_module_1 = require("../checkin/checkin.module");
 let WorkersModule = class WorkersModule {
 };
 WorkersModule = __decorate([
@@ -23,6 +24,7 @@ WorkersModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: worker_entity_1.Worker.name, schema: worker_entity_1.WorkerSchema }]),
             user_module_1.UserModule,
             files_module_1.FilesModule,
+            checkin_module_1.CheckinModule
         ],
         controllers: [workers_controller_1.WorkersController],
         providers: [workers_service_1.WorkersService, calendar_service_1.CalendarService],

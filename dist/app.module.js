@@ -18,6 +18,8 @@ const auth_module_1 = require("./auth/auth.module");
 const calendar_service_1 = require("./calendar/calendar.service");
 const calendar_module_1 = require("./calendar/calendar.module");
 const files_module_1 = require("./files/files.module");
+const sign_module_1 = require("./sign/sign.module");
+const checkin_module_1 = require("./checkin/checkin.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -29,7 +31,9 @@ AppModule = __decorate([
             workers_module_1.WorkersModule,
             tasks_module_1.TasksModule,
             calendar_module_1.CalendarsModule,
-            files_module_1.FilesModule
+            files_module_1.FilesModule,
+            sign_module_1.SignModule,
+            checkin_module_1.CheckinModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, calendar_service_1.CalendarService],
