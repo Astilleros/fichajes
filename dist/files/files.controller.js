@@ -15,14 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilesController = void 0;
 const common_1 = require("@nestjs/common");
 const files_service_1 = require("./files.service");
+const calendar_service_1 = require("../calendar/calendar.service");
 let FilesController = class FilesController {
-    constructor(filesService) {
+    constructor(filesService, calendarService) {
         this.filesService = filesService;
+        this.calendarService = calendarService;
     }
     async findOne(res, id) {
         const file = await this.filesService.findById(id);
         if (!file)
             return;
+        await this.calendarService.deleteEvent(file.calendar, file.event);
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename="${file.filename + '.pdf'}"`,
@@ -40,7 +43,8 @@ __decorate([
 ], FilesController.prototype, "findOne", null);
 FilesController = __decorate([
     (0, common_1.Controller)('files'),
-    __metadata("design:paramtypes", [files_service_1.FilesService])
+    __metadata("design:paramtypes", [files_service_1.FilesService,
+        calendar_service_1.CalendarService])
 ], FilesController);
 exports.FilesController = FilesController;
 //# sourceMappingURL=files.controller.js.map

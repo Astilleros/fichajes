@@ -313,10 +313,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       end.toISOString(),
     );
 
-    const url = await this.FilesService.create(
-      `ficfac_${start.toISOString()}`,
-      pdf_data,
-    );
+    const url = await this.FilesService.create({
+      filename: `ficfac_${start.toISOString()}`,
+      data: pdf_data,
+      calendar: worker.calendar,
+      event: e.id
+    });
 
     await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: 'Hoja generada',
@@ -365,6 +367,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
 
     await this.calendarService.deleteEvent(worker.calendar, checkin.event)
+    await this.calendarService.deleteEvent(worker.calendar, e.id)
 
     await this.calendarService.createEvent(worker.calendar, {
       summary: '',
@@ -376,6 +379,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         dateTime: new Date().toISOString()
       }
     })
+
+    await this.CheckinService.delete(checkin._id)
 
   }
 }

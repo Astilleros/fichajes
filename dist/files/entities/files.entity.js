@@ -21,6 +21,14 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Files.prototype, "data", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Files.prototype, "calendar", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Files.prototype, "event", void 0);
 Files = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })
 ], Files);

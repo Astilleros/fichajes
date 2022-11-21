@@ -21,14 +21,9 @@ let FilesService = class FilesService {
     constructor(FilesModel) {
         this.FilesModel = FilesModel;
     }
-    async create(filename, data) {
-        console.log('FilesService.create', filename, data.length);
-        let file = new this.FilesModel({
-            filename,
-            data,
-        });
-        file = await file.save();
-        console.log('file', file._id);
+    async create(data) {
+        const file = new this.FilesModel(data);
+        await file.save();
         return `https://ficfac.app/api/files/${file === null || file === void 0 ? void 0 : file._id}`;
     }
     async findById(_id) {

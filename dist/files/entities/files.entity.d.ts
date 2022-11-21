@@ -27,5 +27,7 @@ export type FilesDocument = Files & Document;
 export declare class Files {
     readonly filename: string;
     readonly data: string;
+    readonly calendar: string;
+    readonly event: string;
 }
 export declare const FilesSchema: import("mongoose").Schema<Files, import("mongoose").Model<Files, any, any, any, any>, {}, {}, {}, {}, "type", Files>;

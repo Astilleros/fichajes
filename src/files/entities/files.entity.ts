@@ -10,6 +10,12 @@ export class Files {
 
   @Prop()
   readonly data: string;
+
+  @Prop()
+  readonly calendar: string;
+
+  @Prop()
+  readonly event: string;
 }
 
 export const FilesSchema = SchemaFactory.createForClass(Files);
