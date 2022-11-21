@@ -366,8 +366,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       });
     }
 
-    await this.calendarService.deleteEvent(worker.calendar, checkin.event)
-    await this.calendarService.deleteEvent(worker.calendar, e.id)
+    try {
+      await this.calendarService.deleteEvent(worker.calendar, checkin.event)
+    } catch (e) {console.log('Evento ya eliminado.'+ checkin.event);}
+    try {
+      await this.calendarService.deleteEvent(worker.calendar, e.id)
+    } catch (e) {console.log('Evento ya eliminado.'+ e.id);}
 
     await this.calendarService.createEvent(worker.calendar, {
       summary: '',
