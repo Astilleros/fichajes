@@ -393,7 +393,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
 
   async comandoFirmar(worker: WorkerDocument, e: calendar_v3.Schema$Event){
-    if(!e.attachments.length) {
+    if(!e.attachments?.length) {
       return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: 'Olvidaste adjuntar el documento.',
         description: `Intentalo nuevamente comprobando que en la creación de levento se adjunta el archivo correspondiente. Puedes eliminar esta alerta.`,
@@ -412,7 +412,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     })
 
     console.log(sign);
-    
+
+    return await this.calendarService.patchEvent(worker.calendar, e.id, {
+      summary: 'Documento enviado correctamente.',
+      description: `Recibiras confirmación en cuanto se revise.`,
+    });
 
 
   }
