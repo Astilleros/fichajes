@@ -1,26 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateSignDto } from './dto/create-sign.dto';
-import { UpdateSignDto } from './dto/update-sign.dto';
+import { Sign, SignDocument } from './entities/sign.entity';
 
 @Injectable()
 export class SignService {
-  create(createSignDto: CreateSignDto) {
-    return 'This action adds a new sign';
+  constructor(@InjectModel(Sign.name) private SignModel: Model<SignDocument>) {}
+
+  async create(data: CreateSignDto): Promise<Sign> {
+    const file = new this.SignModel(data);
+    return await file.save();
   }
 
-  findAll() {
-    return `This action returns all sign`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} sign`;
-  }
-
-  update(id: number, updateSignDto: UpdateSignDto) {
-    return `This action updates a #${id} sign`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} sign`;
+  async findById(_id: string) {
+    return await this.SignModel.findOne({ _id }).exec();
   }
 }

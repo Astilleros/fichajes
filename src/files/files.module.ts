@@ -11,6 +11,6 @@ import { FilesService } from './files.service';
   ],
   controllers: [FilesController],
   providers: [FilesService, CalendarService],
-  exports: [FilesService]
+  exports: [FilesService],
 })
 export class FilesModule {}

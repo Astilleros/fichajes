@@ -22,7 +22,7 @@ FilesModule = __decorate([
         ],
         controllers: [files_controller_1.FilesController],
         providers: [files_service_1.FilesService, calendar_service_1.CalendarService],
-        exports: [files_service_1.FilesService]
+        exports: [files_service_1.FilesService],
     })
 ], FilesModule);
 exports.FilesModule = FilesModule;

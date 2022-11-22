@@ -9,14 +9,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Sign = void 0;
+exports.SignSchema = exports.Sign = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-class Sign {
-}
+let Sign = class Sign {
+};
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Sign.prototype, "user", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Sign.prototype, "worker", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
@@ -29,5 +33,9 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Sign.prototype, "createdAt", void 0);
+Sign = __decorate([
+    (0, mongoose_1.Schema)({ versionKey: false })
+], Sign);
 exports.Sign = Sign;
+exports.SignSchema = mongoose_1.SchemaFactory.createForClass(Sign);
 //# sourceMappingURL=sign.entity.js.map

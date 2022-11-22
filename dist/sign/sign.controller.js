@@ -16,7 +16,6 @@ exports.SignController = void 0;
 const common_1 = require("@nestjs/common");
 const sign_service_1 = require("./sign.service");
 const create_sign_dto_1 = require("./dto/create-sign.dto");
-const update_sign_dto_1 = require("./dto/update-sign.dto");
 let SignController = class SignController {
     constructor(signService) {
         this.signService = signService;
@@ -24,17 +23,8 @@ let SignController = class SignController {
     create(createSignDto) {
         return this.signService.create(createSignDto);
     }
-    findAll() {
-        return this.signService.findAll();
-    }
-    findOne(id) {
-        return this.signService.findOne(+id);
-    }
-    update(id, updateSignDto) {
-        return this.signService.update(+id, updateSignDto);
-    }
-    remove(id) {
-        return this.signService.remove(+id);
+    findById(id) {
+        return this.signService.findById(id);
     }
 };
 __decorate([
@@ -45,33 +35,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SignController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], SignController.prototype, "findAll", null);
-__decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], SignController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_sign_dto_1.UpdateSignDto]),
-    __metadata("design:returntype", void 0)
-], SignController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SignController.prototype, "remove", null);
+], SignController.prototype, "findById", null);
 SignController = __decorate([
     (0, common_1.Controller)('sign'),
     __metadata("design:paramtypes", [sign_service_1.SignService])

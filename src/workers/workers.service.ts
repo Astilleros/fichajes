@@ -14,6 +14,7 @@ import autoTable from 'jspdf-autotable';
 import { UserService } from 'src/user/user.service';
 import { FilesService } from 'src/files/files.service';
 import { CheckinService } from 'src/checkin/checkin.service';
+import { SignService } from 'src/sign/sign.service';
 
 @Injectable()
 export class WorkersService {
@@ -23,6 +24,7 @@ export class WorkersService {
     private FilesService: FilesService,
     private userService: UserService,
     private CheckinService: CheckinService,
+    private SignService: SignService,
   ) {}
 
   async create(createWorkerDto: Worker): Promise<ListWorkerDto> {
@@ -266,8 +268,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     if (e.summary === '@vincular') return this.comandoVincular(worker, e);
     if (e.summary === '@desvincular') return this.comandoDesvincular(worker, e);
     if (e.summary === '@mes') return this.comandoMes(worker, e);
-    if (e.summary === '@checkin') return this.comandoCheckin(worker, e);
-    if (e.summary === '@checkout') return this.comandoCheckout(worker, e);
+    if (e.summary === '@entrada') return this.comandoEntrada(worker, e);
+    if (e.summary === '@salida') return this.comandoSalida(worker, e);
+    if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
@@ -326,11 +329,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     });
   }
 
-  async comandoCheckin(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+  async comandoEntrada(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
     // Comprobar no hayan entrado ya.
     const needCheckout = await this.CheckinService.findByWorker(worker._id);
     if(needCheckout) {
-      await this.calendarService.patchEvent(worker.calendar, e.id, {
+      return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: '¿Olvidaste fichar la última salida? @checkout pendiente.',
         description: `Estas intentando fichar una nueva entrada sin haber cerrado el anterior registro de entrada. 
         Realiza antes un @checkout para poder hacer @checkin nuevamente.`,
@@ -354,11 +357,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     return checkin
   }
 
-  async comandoCheckout(worker: WorkerDocument, e: calendar_v3.Schema$Event){
+  async comandoSalida(worker: WorkerDocument, e: calendar_v3.Schema$Event){
     // Comprobar que hayan checkin.
     const checkin = await this.CheckinService.findByWorker(worker._id);
     if(!checkin) {
-      await this.calendarService.patchEvent(worker.calendar, e.id, {
+      return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: '¿Olvidaste fichar la última entrada?',
         description: `Si olvidaste registrar la hora de comiendo de periodo con @checkin, sigue los siguientes pasos:
         Primero, registra el @checkin y haz el @checkout normalmente.
@@ -385,6 +388,32 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     })
 
     await this.CheckinService.delete(checkin._id)
+
+  }
+
+
+  async comandoFirmar(worker: WorkerDocument, e: calendar_v3.Schema$Event){
+    if(!e.attachments.length) {
+      return await this.calendarService.patchEvent(worker.calendar, e.id, {
+        summary: 'Olvidaste adjuntar el documento.',
+        description: `Intentalo nuevamente comprobando que en la creación de levento se adjunta el archivo correspondiente. Puedes eliminar esta alerta.`,
+      });
+    }
+    const reference = new Date(e.start.date);
+    const month = new Date(reference.getFullYear(), reference.getMonth(), 1).toISOString();
+      console.log(e.attachments);
+    
+    const sign = await this.SignService.create({
+      user: worker.user,
+      worker: worker._id,
+      file: e.attachments[0].fileUrl,
+      month,
+      createdAt: new Date().toISOString(),
+    })
+
+    console.log(sign);
+    
+
 
   }
 }

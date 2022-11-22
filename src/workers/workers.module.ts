@@ -7,13 +7,15 @@ import { CalendarService } from 'src/calendar/calendar.service';
 import { UserModule } from 'src/user/user.module';
 import { FilesModule } from 'src/files/files.module';
 import { CheckinModule } from 'src/checkin/checkin.module';
+import { SignModule } from 'src/sign/sign.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Worker.name, schema: WorkerSchema }]),
     UserModule,
     FilesModule,
-    CheckinModule
+    CheckinModule,
+    SignModule
   ],
   controllers: [WorkersController],
   providers: [WorkersService, CalendarService],

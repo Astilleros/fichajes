@@ -24,13 +24,15 @@ const jspdf_autotable_1 = require("jspdf-autotable");
 const user_service_1 = require("../user/user.service");
 const files_service_1 = require("../files/files.service");
 const checkin_service_1 = require("../checkin/checkin.service");
+const sign_service_1 = require("../sign/sign.service");
 let WorkersService = class WorkersService {
-    constructor(workerModel, calendarService, FilesService, userService, CheckinService) {
+    constructor(workerModel, calendarService, FilesService, userService, CheckinService, SignService) {
         this.workerModel = workerModel;
         this.calendarService = calendarService;
         this.FilesService = FilesService;
         this.userService = userService;
         this.CheckinService = CheckinService;
+        this.SignService = SignService;
     }
     async create(createWorkerDto) {
         const createdWorker = new this.workerModel(createWorkerDto);
@@ -223,10 +225,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             return this.comandoDesvincular(worker, e);
         if (e.summary === '@mes')
             return this.comandoMes(worker, e);
-        if (e.summary === '@checkin')
-            return this.comandoCheckin(worker, e);
-        if (e.summary === '@checkout')
-            return this.comandoCheckout(worker, e);
+        if (e.summary === '@entrada')
+            return this.comandoEntrada(worker, e);
+        if (e.summary === '@salida')
+            return this.comandoSalida(worker, e);
+        if (e.summary === '@firmar')
+            return this.comandoFirmar(worker, e);
     }
     async comandoVincular(worker, e) {
         if (worker.status === status_enum_1.workerStatus.pending) {
@@ -269,10 +273,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             description: `Enlace de descarga de un uso: ${url}`,
         });
     }
-    async comandoCheckin(worker, e) {
+    async comandoEntrada(worker, e) {
         const needCheckout = await this.CheckinService.findByWorker(worker._id);
         if (needCheckout) {
-            await this.calendarService.patchEvent(worker.calendar, e.id, {
+            return await this.calendarService.patchEvent(worker.calendar, e.id, {
                 summary: '¿Olvidaste fichar la última salida? @checkout pendiente.',
                 description: `Estas intentando fichar una nueva entrada sin haber cerrado el anterior registro de entrada. 
         Realiza antes un @checkout para poder hacer @checkin nuevamente.`,
@@ -293,10 +297,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         });
         return checkin;
     }
-    async comandoCheckout(worker, e) {
+    async comandoSalida(worker, e) {
         const checkin = await this.CheckinService.findByWorker(worker._id);
         if (!checkin) {
-            await this.calendarService.patchEvent(worker.calendar, e.id, {
+            return await this.calendarService.patchEvent(worker.calendar, e.id, {
                 summary: '¿Olvidaste fichar la última entrada?',
                 description: `Si olvidaste registrar la hora de comiendo de periodo con @checkin, sigue los siguientes pasos:
         Primero, registra el @checkin y haz el @checkout normalmente.
@@ -327,6 +331,25 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         });
         await this.CheckinService.delete(checkin._id);
     }
+    async comandoFirmar(worker, e) {
+        if (!e.attachments.length) {
+            return await this.calendarService.patchEvent(worker.calendar, e.id, {
+                summary: 'Olvidaste adjuntar el documento.',
+                description: `Intentalo nuevamente comprobando que en la creación de levento se adjunta el archivo correspondiente. Puedes eliminar esta alerta.`,
+            });
+        }
+        const reference = new Date(e.start.date);
+        const month = new Date(reference.getFullYear(), reference.getMonth(), 1).toISOString();
+        console.log(e.attachments);
+        const sign = await this.SignService.create({
+            user: worker.user,
+            worker: worker._id,
+            file: e.attachments[0].fileUrl,
+            month,
+            createdAt: new Date().toISOString(),
+        });
+        console.log(sign);
+    }
 };
 WorkersService = __decorate([
     (0, common_1.Injectable)(),
@@ -335,7 +358,8 @@ WorkersService = __decorate([
         calendar_service_1.CalendarService,
         files_service_1.FilesService,
         user_service_1.UserService,
-        checkin_service_1.CheckinService])
+        checkin_service_1.CheckinService,
+        sign_service_1.SignService])
 ], WorkersService);
 exports.WorkersService = WorkersService;
 const pad2z = (data) => {
