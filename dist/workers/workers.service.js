@@ -249,9 +249,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         if (e.status === 'cancelled')
             return;
         if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
-            (e.creator.email != worker.email ||
-                e.creator.email != worker.calendar ||
-                e.creator.email != worker.private_calendar)) {
+            e.creator.email != worker.email &&
+            e.creator.email != worker.calendar &&
+            e.creator.email != worker.private_calendar) {
             return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
         if ((_b = e.start) === null || _b === void 0 ? void 0 : _b.date) {
