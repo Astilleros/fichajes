@@ -34,6 +34,7 @@ export declare class Worker {
     readonly email: string;
     readonly mobile: string;
     calendar?: string;
+    private_calendar?: string;
     status?: workerStatus;
     sync: string;
     mode: workerModes;

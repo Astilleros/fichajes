@@ -15,6 +15,7 @@ import { UserService } from 'src/user/user.service';
 import { FilesService } from 'src/files/files.service';
 import { CheckinService } from 'src/checkin/checkin.service';
 import { SignService } from 'src/sign/sign.service';
+import { workerModes } from './dto/mode.enum';
 
 @Injectable()
 export class WorkersService {
@@ -35,7 +36,14 @@ export class WorkersService {
       description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
       timeZone: 'Europe/Madrid',
     });
+
+    const private_calendar = await this.calendarService.createCalendar({
+      summary: `Private FicharFacil ${createdWorker.name}`,
+      description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aquí se registraran los eventos mientras este en modo comando. `,
+      timeZone: 'Europe/Madrid',
+    });
     createdWorker.calendar = calendar.id;
+    createdWorker.private_calendar = private_calendar.id;
     await createdWorker.save();
     return createdWorker.toObject();
   }
@@ -142,6 +150,29 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     );
 
     return updated;
+  }
+
+  async changeMode(user: JwtPayload, worker_id: string, new_mode: workerModes) {
+    const w = await this.workerModel.findOne({
+      _id: worker_id,
+      user: user._id,
+    });
+
+    if (w.mode === new_mode) return w;
+    if (new_mode === workerModes.none)
+      await this.calendarService.unshareCalendar(w.calendar, w.email);
+    if (new_mode === workerModes.place) {
+      if (w.mode !== workerModes.none)
+        await this.calendarService.unshareCalendar(w.calendar, w.email);
+      await this.calendarService.shareCalendar(w.calendar, w.email, 'reader');
+    }
+    if (new_mode > workerModes.place) {
+      if (w.mode === workerModes.place)
+        await this.calendarService.unshareCalendar(w.calendar, w.email);
+      await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
+    }
+    w.mode = new_mode;
+    return await w.save();
   }
 
   async generatePdfToSign(
@@ -264,13 +295,35 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
-    if (!e.start?.date) return; // NO ES UN COMANDO
-    if (e.summary === '@vincular') return this.comandoVincular(worker, e);
-    if (e.summary === '@desvincular') return this.comandoDesvincular(worker, e);
-    if (e.summary === '@mes') return this.comandoMes(worker, e);
-    if (e.summary === '@entrada') return this.comandoEntrada(worker, e);
-    if (e.summary === '@salida') return this.comandoSalida(worker, e);
-    if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
+
+    if(
+      e.creator.email != worker.email ||
+      e.creator.email != worker.calendar ||
+      e.creator.email != worker.private_calendar
+    ){
+      return await this.calendarService.deleteEvent(worker.calendar, e.id);
+    }
+
+    if (e.start?.date) {
+      if (e.summary === '@vincular') return this.comandoVincular(worker, e);
+      if (e.summary === '@desvincular')
+        return this.comandoDesvincular(worker, e);
+      if (e.summary === '@mes') return this.comandoMes(worker, e);
+      if (e.summary === '@entrada') return this.comandoEntrada(worker, e);
+      if (e.summary === '@salida') return this.comandoSalida(worker, e);
+      if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
+    }
+
+
+    if (
+      worker.mode === workerModes.command &&
+      !e.start.date &&
+      e.creator.email === worker.email
+    ) {
+      try {
+        return await this.calendarService.deleteEvent(worker.calendar, e.id);
+      } catch (e) {return e}
+    }
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
@@ -320,7 +373,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       filename: `ficfac_${start.toISOString()}`,
       data: pdf_data,
       calendar: worker.calendar,
-      event: e.id
+      event: e.id,
     });
 
     await this.calendarService.patchEvent(worker.calendar, e.id, {
@@ -332,7 +385,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   async comandoEntrada(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
     // Comprobar no hayan entrado ya.
     const needCheckout = await this.CheckinService.findByWorker(worker._id);
-    if(needCheckout) {
+    if (needCheckout) {
       return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: '¿Olvidaste fichar la última salida? @checkout pendiente.',
         description: `Estas intentando fichar una nueva entrada sin haber cerrado el anterior registro de entrada. 
@@ -340,27 +393,30 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       });
     }
     // Crear nueva entrada
-    const date = new Date().toISOString()
+    const date = new Date().toISOString();
     const checkin = await this.CheckinService.create({
       worker: worker._id,
       calendar: worker.calendar,
       date,
-      event: e.id
-    })
-    if(!checkin) throw new Error(`Imposible crear registro de entrada del trabajador: ${worker.name}`)
-    
+      event: e.id,
+    });
+    if (!checkin)
+      throw new Error(
+        `Imposible crear registro de entrada del trabajador: ${worker.name}`,
+      );
+
     await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: `Checkin abierto a las ${date}`,
       description: `Recuerda hacer @checkout para registrar la hora de finalización de periodo y registrar la jornada.`,
     });
 
-    return checkin
+    return checkin;
   }
 
-  async comandoSalida(worker: WorkerDocument, e: calendar_v3.Schema$Event){
+  async comandoSalida(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
     // Comprobar que hayan checkin.
     const checkin = await this.CheckinService.findByWorker(worker._id);
-    if(!checkin) {
+    if (!checkin) {
       return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: '¿Olvidaste fichar la última entrada?',
         description: `Si olvidaste registrar la hora de comiendo de periodo con @checkin, sigue los siguientes pasos:
@@ -370,55 +426,73 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
 
     try {
-      await this.calendarService.deleteEvent(worker.calendar, checkin.event)
-    } catch (e) {console.log('Evento ya eliminado.'+ checkin.event);}
+      await this.calendarService.deleteEvent(worker.calendar, checkin.event);
+    } catch (e) {
+      console.log('Evento ya eliminado.' + checkin.event);
+    }
     try {
-      await this.calendarService.deleteEvent(worker.calendar, e.id)
-    } catch (e) {console.log('Evento ya eliminado.'+ e.id);}
+      await this.calendarService.deleteEvent(worker.calendar, e.id);
+    } catch (e) {
+      console.log('Evento ya eliminado.' + e.id);
+    }
 
-    await this.calendarService.createEvent(worker.calendar, {
-      summary: '',
-      description: '',
-      start: {
-        dateTime: checkin.date,
-      },
-      end: {
-        dateTime: new Date().toISOString()
-      }
-    })
+    if (worker.mode === workerModes.command) {
+      await this.calendarService.createEvent(worker.private_calendar, {
+        summary: '',
+        description: '',
+        start: {
+          dateTime: checkin.date,
+        },
+        end: {
+          dateTime: new Date().toISOString(),
+        },
+        attendees: [{
+          email: worker.calendar
+        }]
+      });
+    } else {
+      await this.calendarService.createEvent(worker.calendar, {
+        summary: '',
+        description: '',
+        start: {
+          dateTime: checkin.date,
+        },
+        end: {
+          dateTime: new Date().toISOString(),
+        },
+      });
+    }
 
-    await this.CheckinService.delete(checkin._id)
-
+    await this.CheckinService.delete(checkin._id);
   }
 
-
-  async comandoFirmar(worker: WorkerDocument, e: calendar_v3.Schema$Event){
-    if(!e.attachments?.length) {
+  async comandoFirmar(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    if (!e.attachments?.length) {
       return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: 'Olvidaste adjuntar el documento.',
         description: `Intentalo nuevamente comprobando que en la creación de levento se adjunta el archivo correspondiente. Puedes eliminar esta alerta.`,
       });
     }
+
     const reference = new Date(e.start.date);
-    const month = new Date(reference.getFullYear(), reference.getMonth(), 1).toISOString();
-      console.log(e.attachments);
-    
-    const sign = await this.SignService.create({
+    const month = new Date(
+      reference.getFullYear(),
+      reference.getMonth(),
+      1,
+    ).toISOString();
+
+    await this.SignService.create({
       user: worker.user,
       worker: worker._id,
       file: e.attachments[0].fileUrl,
       month,
       createdAt: new Date().toISOString(),
-    })
-
-    console.log(sign);
+    });
 
     return await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: 'Documento enviado correctamente.',
       description: `Recibiras confirmación en cuanto se revise.`,
     });
-
-
   }
 }
 

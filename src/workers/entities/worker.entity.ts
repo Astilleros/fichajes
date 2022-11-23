@@ -32,6 +32,9 @@ export class Worker {
   @Prop({ default: '' })
   calendar?: string;
 
+  @Prop({ default: '' })
+  private_calendar?: string;
+
   @Prop({ default: workerStatus.unlinked })
   status?: workerStatus;
 

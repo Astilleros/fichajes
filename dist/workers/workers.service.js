@@ -25,6 +25,7 @@ const user_service_1 = require("../user/user.service");
 const files_service_1 = require("../files/files.service");
 const checkin_service_1 = require("../checkin/checkin.service");
 const sign_service_1 = require("../sign/sign.service");
+const mode_enum_1 = require("./dto/mode.enum");
 let WorkersService = class WorkersService {
     constructor(workerModel, calendarService, FilesService, userService, CheckinService, SignService) {
         this.workerModel = workerModel;
@@ -41,7 +42,13 @@ let WorkersService = class WorkersService {
             description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
             timeZone: 'Europe/Madrid',
         });
+        const private_calendar = await this.calendarService.createCalendar({
+            summary: `Private FicharFacil ${createdWorker.name}`,
+            description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aquí se registraran los eventos mientras este en modo comando. `,
+            timeZone: 'Europe/Madrid',
+        });
         createdWorker.calendar = calendar.id;
+        createdWorker.private_calendar = private_calendar.id;
         await createdWorker.save();
         return createdWorker.toObject();
     }
@@ -117,6 +124,28 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         await this.calendarService.unshareCalendar(worker.calendar, worker.email);
         const updated = await this.workerModel.findOneAndUpdate({ _id: worker._id }, { status: 0 }, { new: true });
         return updated;
+    }
+    async changeMode(user, worker_id, new_mode) {
+        const w = await this.workerModel.findOne({
+            _id: worker_id,
+            user: user._id,
+        });
+        if (w.mode === new_mode)
+            return w;
+        if (new_mode === mode_enum_1.workerModes.none)
+            await this.calendarService.unshareCalendar(w.calendar, w.email);
+        if (new_mode === mode_enum_1.workerModes.place) {
+            if (w.mode !== mode_enum_1.workerModes.none)
+                await this.calendarService.unshareCalendar(w.calendar, w.email);
+            await this.calendarService.shareCalendar(w.calendar, w.email, 'reader');
+        }
+        if (new_mode > mode_enum_1.workerModes.place) {
+            if (w.mode === mode_enum_1.workerModes.place)
+                await this.calendarService.unshareCalendar(w.calendar, w.email);
+            await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
+        }
+        w.mode = new_mode;
+        return await w.save();
     }
     async generatePdfToSign(userJwt, worker_id, start, end) {
         console.log(start, end);
@@ -217,20 +246,35 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
     async watchEvent(worker, e) {
         var _a;
-        if (!((_a = e.start) === null || _a === void 0 ? void 0 : _a.date))
-            return;
-        if (e.summary === '@vincular')
-            return this.comandoVincular(worker, e);
-        if (e.summary === '@desvincular')
-            return this.comandoDesvincular(worker, e);
-        if (e.summary === '@mes')
-            return this.comandoMes(worker, e);
-        if (e.summary === '@entrada')
-            return this.comandoEntrada(worker, e);
-        if (e.summary === '@salida')
-            return this.comandoSalida(worker, e);
-        if (e.summary === '@firmar')
-            return this.comandoFirmar(worker, e);
+        if (e.creator.email != worker.email ||
+            e.creator.email != worker.calendar ||
+            e.creator.email != worker.private_calendar) {
+            return await this.calendarService.deleteEvent(worker.calendar, e.id);
+        }
+        if ((_a = e.start) === null || _a === void 0 ? void 0 : _a.date) {
+            if (e.summary === '@vincular')
+                return this.comandoVincular(worker, e);
+            if (e.summary === '@desvincular')
+                return this.comandoDesvincular(worker, e);
+            if (e.summary === '@mes')
+                return this.comandoMes(worker, e);
+            if (e.summary === '@entrada')
+                return this.comandoEntrada(worker, e);
+            if (e.summary === '@salida')
+                return this.comandoSalida(worker, e);
+            if (e.summary === '@firmar')
+                return this.comandoFirmar(worker, e);
+        }
+        if (worker.mode === mode_enum_1.workerModes.command &&
+            !e.start.date &&
+            e.creator.email === worker.email) {
+            try {
+                return await this.calendarService.deleteEvent(worker.calendar, e.id);
+            }
+            catch (e) {
+                return e;
+            }
+        }
     }
     async comandoVincular(worker, e) {
         if (worker.status === status_enum_1.workerStatus.pending) {
@@ -266,7 +310,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             filename: `ficfac_${start.toISOString()}`,
             data: pdf_data,
             calendar: worker.calendar,
-            event: e.id
+            event: e.id,
         });
         await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Hoja generada',
@@ -287,7 +331,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             worker: worker._id,
             calendar: worker.calendar,
             date,
-            event: e.id
+            event: e.id,
         });
         if (!checkin)
             throw new Error(`Imposible crear registro de entrada del trabajador: ${worker.name}`);
@@ -319,16 +363,33 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         catch (e) {
             console.log('Evento ya eliminado.' + e.id);
         }
-        await this.calendarService.createEvent(worker.calendar, {
-            summary: '',
-            description: '',
-            start: {
-                dateTime: checkin.date,
-            },
-            end: {
-                dateTime: new Date().toISOString()
-            }
-        });
+        if (worker.mode === mode_enum_1.workerModes.command) {
+            await this.calendarService.createEvent(worker.private_calendar, {
+                summary: '',
+                description: '',
+                start: {
+                    dateTime: checkin.date,
+                },
+                end: {
+                    dateTime: new Date().toISOString(),
+                },
+                attendees: [{
+                        email: worker.calendar
+                    }]
+            });
+        }
+        else {
+            await this.calendarService.createEvent(worker.calendar, {
+                summary: '',
+                description: '',
+                start: {
+                    dateTime: checkin.date,
+                },
+                end: {
+                    dateTime: new Date().toISOString(),
+                },
+            });
+        }
         await this.CheckinService.delete(checkin._id);
     }
     async comandoFirmar(worker, e) {
@@ -341,15 +402,13 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         }
         const reference = new Date(e.start.date);
         const month = new Date(reference.getFullYear(), reference.getMonth(), 1).toISOString();
-        console.log(e.attachments);
-        const sign = await this.SignService.create({
+        await this.SignService.create({
             user: worker.user,
             worker: worker._id,
             file: e.attachments[0].fileUrl,
             month,
             createdAt: new Date().toISOString(),
         });
-        console.log(sign);
         return await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Documento enviado correctamente.',
             description: `Recibiras confirmación en cuanto se revise.`,

@@ -33,6 +33,7 @@ import { UserService } from 'src/user/user.service';
 import { FilesService } from 'src/files/files.service';
 import { CheckinService } from 'src/checkin/checkin.service';
 import { SignService } from 'src/sign/sign.service';
+import { workerModes } from './dto/mode.enum';
 export declare class WorkersService {
     private workerModel;
     private calendarService;
@@ -59,11 +60,14 @@ export declare class WorkersService {
     unshareCalendar(user_id: string, worker_id: string): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
+    changeMode(user: JwtPayload, worker_id: string, new_mode: workerModes): Promise<Worker & import("mongoose").Document<any, any, any> & {
+        _id: import("mongoose").Types.ObjectId;
+    }>;
     generatePdfToSign(userJwt: JwtPayload, worker_id: string, start: string, end: string): Promise<any>;
     getWorkerByCalendar(calendar: string): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void | calendar_v3.Schema$Event | import("../checkin/entities/checkin.entity").CheckinDocument>;
+    watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<any>;
     comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;
     comandoDesvincular(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;
     comandoMes(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;

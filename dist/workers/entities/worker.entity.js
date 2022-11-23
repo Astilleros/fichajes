@@ -48,6 +48,10 @@ __decorate([
     __metadata("design:type", String)
 ], Worker.prototype, "calendar", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ default: '' }),
+    __metadata("design:type", String)
+], Worker.prototype, "private_calendar", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ default: status_enum_1.workerStatus.unlinked }),
     __metadata("design:type", Number)
 ], Worker.prototype, "status", void 0);
