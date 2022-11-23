@@ -324,7 +324,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Hoja generada',
             description: `Enlace de descarga de un uso: ${url}`,
-            attachments: [{ fileUrl: url }]
+            attachments: [{ fileUrl: url, title: 'Hoja.pdf', mimeType: 'application/pdf' }]
         });
     }
     async comandoEntrada(worker, e) {
