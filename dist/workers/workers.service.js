@@ -245,13 +245,16 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return worker;
     }
     async watchEvent(worker, e) {
-        var _a;
-        if (e.creator.email != worker.email ||
-            e.creator.email != worker.calendar ||
-            e.creator.email != worker.private_calendar) {
+        var _a, _b;
+        if (e.status === 'cancelled')
+            return;
+        if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
+            (e.creator.email != worker.email ||
+                e.creator.email != worker.calendar ||
+                e.creator.email != worker.private_calendar)) {
             return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
-        if ((_a = e.start) === null || _a === void 0 ? void 0 : _a.date) {
+        if ((_b = e.start) === null || _b === void 0 ? void 0 : _b.date) {
             if (e.summary === '@vincular')
                 return this.comandoVincular(worker, e);
             if (e.summary === '@desvincular')

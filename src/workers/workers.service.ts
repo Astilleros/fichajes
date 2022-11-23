@@ -295,11 +295,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
-
+    if(e.status === 'cancelled') return;
     if(
-      e.creator.email != worker.email ||
+      e.creator?.email.length &&
+      (e.creator.email != worker.email ||
       e.creator.email != worker.calendar ||
-      e.creator.email != worker.private_calendar
+      e.creator.email != worker.private_calendar)
     ){
       return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
