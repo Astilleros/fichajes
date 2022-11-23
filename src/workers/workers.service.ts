@@ -296,9 +296,19 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
     if(e.status === 'cancelled') return;
+
     if(
       e.creator?.email.length &&
-      e.creator.email != worker.email &&
+      e.creator.email != worker.email && // SOLO
+      e.creator.email != worker.calendar &&
+      e.creator.email != worker.private_calendar
+    ){
+      return await this.calendarService.deleteEvent(worker.calendar, e.id);
+    }
+
+    if(
+      worker.mode === workerModes.command &&
+      e.creator?.email.length &&
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
     ){
@@ -380,6 +390,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: 'Hoja generada',
       description: `Enlace de descarga de un uso: ${url}`,
+      attachments:[{fileUrl: url}]
     });
   }
 

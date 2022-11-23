@@ -245,7 +245,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return worker;
     }
     async watchEvent(worker, e) {
-        var _a, _b;
+        var _a, _b, _c;
         if (e.status === 'cancelled')
             return;
         if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
@@ -254,7 +254,13 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             e.creator.email != worker.private_calendar) {
             return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
-        if ((_b = e.start) === null || _b === void 0 ? void 0 : _b.date) {
+        if (worker.mode === mode_enum_1.workerModes.command &&
+            ((_b = e.creator) === null || _b === void 0 ? void 0 : _b.email.length) &&
+            e.creator.email != worker.calendar &&
+            e.creator.email != worker.private_calendar) {
+            return await this.calendarService.deleteEvent(worker.calendar, e.id);
+        }
+        if ((_c = e.start) === null || _c === void 0 ? void 0 : _c.date) {
             if (e.summary === '@vincular')
                 return this.comandoVincular(worker, e);
             if (e.summary === '@desvincular')
@@ -318,6 +324,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Hoja generada',
             description: `Enlace de descarga de un uso: ${url}`,
+            attachments: [{ fileUrl: url }]
         });
     }
     async comandoEntrada(worker, e) {
