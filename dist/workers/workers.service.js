@@ -71,7 +71,12 @@ let WorkersService = class WorkersService {
         const worker = this.workerModel.findOne({ _id, user: user_id }).exec();
         return worker;
     }
-    update(user_id, _id, updateWorkerDto) {
+    async update(user_id, _id, updateWorkerDto) {
+        const worker = await this.workerModel.findById(_id);
+        if (updateWorkerDto.mode !== worker.mode) {
+            const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode);
+            updateWorkerDto.mode = editMode.mode;
+        }
         return this.workerModel
             .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
             .exec();
@@ -86,6 +91,7 @@ let WorkersService = class WorkersService {
             worker.status === status_enum_1.workerStatus.pending)
             await this.calendarService.unshareCalendar(worker.calendar, worker.email);
         await this.calendarService.deleteCalendar(worker.calendar);
+        await this.calendarService.deleteCalendar(worker.private_calendar);
         return worker;
     }
     async shareCalendar(user_id, worker_id) {
@@ -125,10 +131,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         const updated = await this.workerModel.findOneAndUpdate({ _id: worker._id }, { status: 0 }, { new: true });
         return updated;
     }
-    async changeMode(user, worker_id, new_mode) {
+    async changeMode(user_id, worker_id, new_mode) {
         const w = await this.workerModel.findOne({
             _id: worker_id,
-            user: user._id,
+            user: user_id,
         });
         if (w.mode === new_mode)
             return w;
@@ -323,7 +329,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         });
         await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Hoja generada',
-            description: `Enlace de descarga de un uso: ${url}`
+            description: `Enlace de descarga de un uso: ${url}`,
         });
     }
     async comandoEntrada(worker, e) {
@@ -382,9 +388,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 end: {
                     dateTime: new Date().toISOString(),
                 },
-                attendees: [{
-                        email: worker.calendar
-                    }]
+                attendees: [
+                    {
+                        email: worker.calendar,
+                    },
+                ],
             });
         }
         else {

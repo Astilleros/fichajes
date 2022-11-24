@@ -79,7 +79,12 @@ export class WorkersService {
     return worker;
   }
 
-  update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
+  async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
+    const worker = await this.workerModel.findById(_id);
+    if(updateWorkerDto.mode !== worker.mode){
+      const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode)
+      updateWorkerDto.mode = editMode.mode
+    }
     return this.workerModel
       .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
       .exec();
@@ -97,6 +102,7 @@ export class WorkersService {
       await this.calendarService.unshareCalendar(worker.calendar, worker.email);
 
     await this.calendarService.deleteCalendar(worker.calendar);
+    await this.calendarService.deleteCalendar(worker.private_calendar);
     return worker;
   }
 
@@ -152,12 +158,12 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     return updated;
   }
 
-  async changeMode(user: JwtPayload, worker_id: string, new_mode: workerModes) {
+  async changeMode(user_id: string, worker_id: string, new_mode: workerModes) {
     const w = await this.workerModel.findOne({
       _id: worker_id,
-      user: user._id,
+      user: user_id,
     });
-
+    
     if (w.mode === new_mode) return w;
     if (new_mode === workerModes.none)
       await this.calendarService.unshareCalendar(w.calendar, w.email);
@@ -295,23 +301,23 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
-    if(e.status === 'cancelled') return;
+    if (e.status === 'cancelled') return;
 
-    if(
+    if (
       e.creator?.email.length &&
       e.creator.email != worker.email && // SOLO
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
-    ){
+    ) {
       return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
 
-    if(
+    if (
       worker.mode === workerModes.command &&
       e.creator?.email.length &&
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
-    ){
+    ) {
       return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
 
@@ -325,7 +331,6 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
     }
 
-
     if (
       worker.mode === workerModes.command &&
       !e.start.date &&
@@ -333,7 +338,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     ) {
       try {
         return await this.calendarService.deleteEvent(worker.calendar, e.id);
-      } catch (e) {return e}
+      } catch (e) {
+        return e;
+      }
     }
   }
 
@@ -389,7 +396,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
     await this.calendarService.patchEvent(worker.calendar, e.id, {
       summary: 'Hoja generada',
-      description: `Enlace de descarga de un uso: ${url}`
+      description: `Enlace de descarga de un uso: ${url}`,
     });
   }
 
@@ -457,9 +464,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         end: {
           dateTime: new Date().toISOString(),
         },
-        attendees: [{
-          email: worker.calendar
-        }]
+        attendees: [
+          {
+            email: worker.calendar,
+          },
+        ],
       });
     } else {
       await this.calendarService.createEvent(worker.calendar, {

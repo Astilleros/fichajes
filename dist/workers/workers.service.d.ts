@@ -60,7 +60,7 @@ export declare class WorkersService {
     unshareCalendar(user_id: string, worker_id: string): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    changeMode(user: JwtPayload, worker_id: string, new_mode: workerModes): Promise<Worker & import("mongoose").Document<any, any, any> & {
+    changeMode(user_id: string, worker_id: string, new_mode: workerModes): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
     generatePdfToSign(userJwt: JwtPayload, worker_id: string, start: string, end: string): Promise<any>;
