@@ -81,8 +81,6 @@ export class WorkersService {
 
   async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
     const worker = await this.workerModel.findById(_id);
-    console.log(worker.toObject());
-    console.log(updateWorkerDto.mode, worker.mode,updateWorkerDto.mode !== worker.mode);
     
     if (updateWorkerDto.mode && updateWorkerDto.mode !== worker.mode) {
       const editMode = await this.changeMode(
@@ -92,7 +90,6 @@ export class WorkersService {
       );
       updateWorkerDto.mode = editMode.mode;
     }
-    console.log('update mode', updateWorkerDto.mode);
     
     return this.workerModel
       .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
@@ -462,7 +459,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
 
     if (worker.mode === workerModes.command) {
-      await this.calendarService.createEvent(worker.private_calendar, {
+      await this.calendarService.createEvent(worker.calendar, {
         summary: '',
         description: '',
         start: {
@@ -471,11 +468,11 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         end: {
           dateTime: new Date().toISOString(),
         },
-        attendees: [
+/*         attendees: [
           {
             email: worker.calendar,
           },
-        ],
+        ], */
       });
     } else {
       await this.calendarService.createEvent(worker.calendar, {

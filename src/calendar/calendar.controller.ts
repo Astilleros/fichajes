@@ -29,7 +29,7 @@ export class CalendarController {
   console.log('worker',worker);
     
     const sync = new Date().toISOString();
-    console.log('sync', sync);
+    console.log('new sync', sync);
     
     const new_events = await this.calendarService.getChanges(
       calendarId,

@@ -121,7 +121,9 @@ let CalendarService = class CalendarService {
         const options = {
             calendarId,
             updatedMin,
-            singleEvents: false
+            singleEvents: false,
+            showDeleted: false,
+            showHiddenInvitations: false
         };
         const response = await this.client.events.list(options);
         return response.data.items;

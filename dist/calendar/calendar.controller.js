@@ -36,7 +36,7 @@ let CalendarController = class CalendarController {
             throw new Error('No encuentra en worker');
         console.log('worker', worker);
         const sync = new Date().toISOString();
-        console.log('sync', sync);
+        console.log('new sync', sync);
         const new_events = await this.calendarService.getChanges(calendarId, worker.sync);
         for (let i = 0; i < new_events.length; i++) {
             const e = new_events[i];

@@ -136,7 +136,9 @@ export class CalendarService {
     const options: calendar_v3.Params$Resource$Events$List = {
       calendarId,
       updatedMin,
-      singleEvents: false
+      singleEvents: false,
+      showDeleted: false,
+      showHiddenInvitations: false
     }
     const response = await this.client.events.list(options);
     return response.data.items;
