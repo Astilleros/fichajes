@@ -63,6 +63,10 @@ __decorate([
     (0, mongoose_1.Prop)({ enum: mode_enum_1.workerModes, default: mode_enum_1.workerModes.none }),
     __metadata("design:type", Number)
 ], Worker.prototype, "mode", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Worker.prototype, "locked", void 0);
 Worker = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })
 ], Worker);

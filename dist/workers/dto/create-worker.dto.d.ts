@@ -9,4 +9,5 @@ export declare class CreateWorkerDto {
     status: workerStatus;
     sync: string;
     mode: workerModes;
+    locked?: boolean;
 }

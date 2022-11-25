@@ -38,5 +38,6 @@ export declare class Worker {
     status?: workerStatus;
     sync: string;
     mode: workerModes;
+    locked?: boolean;
 }
 export declare const WorkerSchema: import("mongoose").Schema<Worker, import("mongoose").Model<Worker, any, any, any, any>, {}, {}, {}, {}, "type", Worker>;

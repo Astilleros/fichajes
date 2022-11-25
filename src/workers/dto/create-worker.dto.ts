@@ -9,5 +9,6 @@ export class CreateWorkerDto {
   mobile: string;
   status: workerStatus;
   sync: string;
-  mode: workerModes
+  mode: workerModes;
+  locked?: boolean;
 }

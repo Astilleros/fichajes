@@ -336,16 +336,6 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
     }
 
-    // Desechamos eventos creados por el usuario en modo comando.
-    if (
-      worker.mode === workerModes.command &&
-      e.creator?.email.length &&
-      e.creator.email != worker.calendar &&
-      e.creator.email != worker.private_calendar
-    ) {
-      return await this.calendarService.deleteEvent(worker.calendar, e.id);
-    }
-
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
@@ -458,34 +448,16 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       console.log('Evento ya eliminado.' + e.id);
     }
 
-    if (worker.mode === workerModes.command) {
-      await this.calendarService.createEvent(worker.calendar, {
-        summary: '',
-        description: '',
-        start: {
-          dateTime: checkin.date,
-        },
-        end: {
-          dateTime: new Date().toISOString(),
-        },
-/*         attendees: [
-          {
-            email: worker.calendar,
-          },
-        ], */
-      });
-    } else {
-      await this.calendarService.createEvent(worker.calendar, {
-        summary: '',
-        description: '',
-        start: {
-          dateTime: checkin.date,
-        },
-        end: {
-          dateTime: new Date().toISOString(),
-        },
-      });
-    }
+    await this.calendarService.createEvent(worker.calendar, {
+      summary: '',
+      description: '',
+      start: {
+        dateTime: checkin.date,
+      },
+      end: {
+        dateTime: new Date().toISOString(),
+      },
+    });
 
     await this.CheckinService.delete(checkin._id);
   }

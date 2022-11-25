@@ -253,7 +253,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return worker;
     }
     async watchEvent(worker, e) {
-        var _a, _b, _c;
+        var _a, _b;
         if (e.status === 'cancelled')
             return;
         if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
@@ -275,12 +275,6 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 return this.comandoSalida(worker, e);
             if (e.summary === '@firmar')
                 return this.comandoFirmar(worker, e);
-        }
-        if (worker.mode === mode_enum_1.workerModes.command &&
-            ((_c = e.creator) === null || _c === void 0 ? void 0 : _c.email.length) &&
-            e.creator.email != worker.calendar &&
-            e.creator.email != worker.private_calendar) {
-            return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
     }
     async comandoVincular(worker, e) {
@@ -370,30 +364,16 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         catch (e) {
             console.log('Evento ya eliminado.' + e.id);
         }
-        if (worker.mode === mode_enum_1.workerModes.command) {
-            await this.calendarService.createEvent(worker.calendar, {
-                summary: '',
-                description: '',
-                start: {
-                    dateTime: checkin.date,
-                },
-                end: {
-                    dateTime: new Date().toISOString(),
-                },
-            });
-        }
-        else {
-            await this.calendarService.createEvent(worker.calendar, {
-                summary: '',
-                description: '',
-                start: {
-                    dateTime: checkin.date,
-                },
-                end: {
-                    dateTime: new Date().toISOString(),
-                },
-            });
-        }
+        await this.calendarService.createEvent(worker.calendar, {
+            summary: '',
+            description: '',
+            start: {
+                dateTime: checkin.date,
+            },
+            end: {
+                dateTime: new Date().toISOString(),
+            },
+        });
         await this.CheckinService.delete(checkin._id);
     }
     async comandoFirmar(worker, e) {

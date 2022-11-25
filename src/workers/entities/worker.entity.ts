@@ -41,8 +41,11 @@ export class Worker {
   @Prop({ default: new Date().toISOString() })
   sync: string;
 
-  @Prop({ enum: workerModes, default: workerModes.none})
-  mode: workerModes
+  @Prop({ enum: workerModes, default: workerModes.none })
+  mode: workerModes;
+
+  @Prop({ default: false })
+  locked?: boolean;
 }
 
 export const WorkerSchema = SchemaFactory.createForClass(Worker);
