@@ -77,6 +77,7 @@ let WorkersService = class WorkersService {
             const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode);
             updateWorkerDto.mode = editMode.mode;
         }
+        console.log('update mode', updateWorkerDto.mode);
         return this.workerModel
             .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
             .exec();
@@ -150,7 +151,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 await this.calendarService.unshareCalendar(w.calendar, w.email);
             await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
         }
+        console.log('a', w.mode);
         w.mode = new_mode;
+        console.log('b', w.mode);
         return await w.save();
     }
     async generatePdfToSign(userJwt, worker_id, start, end) {
@@ -260,13 +263,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             e.creator.email != worker.private_calendar) {
             return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
-        if (worker.mode === mode_enum_1.workerModes.command &&
-            ((_b = e.creator) === null || _b === void 0 ? void 0 : _b.email.length) &&
-            e.creator.email != worker.calendar &&
-            e.creator.email != worker.private_calendar) {
-            return await this.calendarService.deleteEvent(worker.calendar, e.id);
-        }
-        if ((_c = e.start) === null || _c === void 0 ? void 0 : _c.date) {
+        if ((_b = e.start) === null || _b === void 0 ? void 0 : _b.date) {
             if (e.summary === '@vincular')
                 return this.comandoVincular(worker, e);
             if (e.summary === '@desvincular')
@@ -281,14 +278,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 return this.comandoFirmar(worker, e);
         }
         if (worker.mode === mode_enum_1.workerModes.command &&
-            !e.start.date &&
-            e.creator.email === worker.email) {
-            try {
-                return await this.calendarService.deleteEvent(worker.calendar, e.id);
-            }
-            catch (e) {
-                return e;
-            }
+            ((_c = e.creator) === null || _c === void 0 ? void 0 : _c.email.length) &&
+            e.creator.email != worker.calendar &&
+            e.creator.email != worker.private_calendar) {
+            return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
     }
     async comandoVincular(worker, e) {

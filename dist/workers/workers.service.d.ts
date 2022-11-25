@@ -67,7 +67,7 @@ export declare class WorkersService {
     getWorkerByCalendar(calendar: string): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<any>;
+    watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void | calendar_v3.Schema$Event | import("../checkin/entities/checkin.entity").CheckinDocument>;
     comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;
     comandoDesvincular(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;
     comandoMes(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void>;

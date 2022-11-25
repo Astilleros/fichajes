@@ -81,10 +81,16 @@ export class WorkersService {
 
   async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
     const worker = await this.workerModel.findById(_id);
-    if(updateWorkerDto.mode !== worker.mode){
-      const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode)
-      updateWorkerDto.mode = editMode.mode
+    if (updateWorkerDto.mode !== worker.mode) {
+      const editMode = await this.changeMode(
+        user_id,
+        worker._id,
+        updateWorkerDto.mode,
+      );
+      updateWorkerDto.mode = editMode.mode;
     }
+    console.log('update mode', updateWorkerDto.mode);
+    
     return this.workerModel
       .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
       .exec();
@@ -163,21 +169,27 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       _id: worker_id,
       user: user_id,
     });
-    
+
     if (w.mode === new_mode) return w;
+
     if (new_mode === workerModes.none)
       await this.calendarService.unshareCalendar(w.calendar, w.email);
+
     if (new_mode === workerModes.place) {
       if (w.mode !== workerModes.none)
         await this.calendarService.unshareCalendar(w.calendar, w.email);
       await this.calendarService.shareCalendar(w.calendar, w.email, 'reader');
     }
+
     if (new_mode > workerModes.place) {
-      if (w.mode === workerModes.place)
+      if(w.mode === workerModes.place)
         await this.calendarService.unshareCalendar(w.calendar, w.email);
       await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
     }
+
+    console.log('a',w.mode);
     w.mode = new_mode;
+    console.log('b',w.mode);
     return await w.save();
   }
 
@@ -301,20 +313,13 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    // Desechamos eventos eliminados
     if (e.status === 'cancelled') return;
 
+    // Desechamos eventos creados por personas ajenas al trabajador y calendarios del mismo.
     if (
       e.creator?.email.length &&
-      e.creator.email != worker.email && // SOLO
-      e.creator.email != worker.calendar &&
-      e.creator.email != worker.private_calendar
-    ) {
-      return await this.calendarService.deleteEvent(worker.calendar, e.id);
-    }
-
-    if (
-      worker.mode === workerModes.command &&
-      e.creator?.email.length &&
+      e.creator.email != worker.email &&
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
     ) {
@@ -331,17 +336,16 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
     }
 
+    // Desechamos eventos creados por el usuario en modo comando.
     if (
       worker.mode === workerModes.command &&
-      !e.start.date &&
-      e.creator.email === worker.email
+      e.creator?.email.length &&
+      e.creator.email != worker.calendar &&
+      e.creator.email != worker.private_calendar
     ) {
-      try {
-        return await this.calendarService.deleteEvent(worker.calendar, e.id);
-      } catch (e) {
-        return e;
-      }
+      return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
+
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
