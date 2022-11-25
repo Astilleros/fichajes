@@ -81,6 +81,9 @@ export class WorkersService {
 
   async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
     const worker = await this.workerModel.findById(_id);
+    console.log(worker.toObject());
+    console.log(updateWorkerDto.mode, worker.mode,updateWorkerDto.mode !== worker.mode);
+    
     if (updateWorkerDto.mode !== worker.mode) {
       const editMode = await this.changeMode(
         user_id,
