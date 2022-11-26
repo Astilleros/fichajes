@@ -32,13 +32,13 @@ export class WorkersService {
     const createdWorker = new this.workerModel(createWorkerDto);
 
     const calendar = await this.calendarService.createCalendar({
-      summary: `FicharFacil ${createdWorker.name}`,
+      summary: `FicFac: ${createdWorker.name}`,
       description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
       timeZone: 'Europe/Madrid',
     });
 
     const private_calendar = await this.calendarService.createCalendar({
-      summary: `Private FicharFacil ${createdWorker.name}`,
+      summary: `*FicFac*: ${createdWorker.name}`,
       description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aquí se registraran los eventos mientras este en modo comando. `,
       timeZone: 'Europe/Madrid',
     });
@@ -199,20 +199,23 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     start: string,
     end: string,
   ) {
-    console.log(start, end);
+    const startD = new Date(start)
+    const endD = new Date(end)
+    const endM = new Date(endD.getTime() -1)
 
     const user = await this.userService.findOne(userJwt._id);
     const worker = await this.findOne(userJwt._id, worker_id);
     const events = await this.filterEvents(
       userJwt,
       worker_id,
-      new Date(start).toISOString(),
-      new Date(end).toISOString(),
+      startD.toISOString(),
+      endD.toISOString(),
     );
     console.log(events.length);
 
     const doc: any = new jsPDF({});
     autoTable(doc, {
+      
       head: [],
       body: [
         [
@@ -225,8 +228,13 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
           'Dni: ' + worker.dni,
           'Seguridad social: ' + worker.seguridad_social,
         ],
+        [
+          'Fecha inicio: ' +  pad2z(startD.getDate()) +'-'+ pad2z(startD.getMonth()+1) +'-'+startD.getFullYear(),
+          'Fecha fin: ' +  pad2z(endM.getDate()) +'-'+ pad2z(endM.getMonth()+1) +'-'+endM.getFullYear()
+        ]
       ],
       startY: 5,
+      theme: 'grid',
     });
 
     const body: any = [];
@@ -290,7 +298,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       row[i] = i;
     }
     autoTable(doc, {
-      head: [['Día', ...row, 'Horas']],
+      head: [['Dia', ...row, 'Horas']],
       body,
       startY: doc.lastAutoTable.finalY,
       theme: 'grid',
@@ -299,9 +307,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       head: [],
       body: [
         ['Total horas: ' + total_hours, 'Total dias: ' + total_days],
-        ['Firma Trabajador', 'Empresa'],
+        ['Firma Trabajador\n\n', 'Empresa\n\n'],
       ],
       startY: doc.lastAutoTable.finalY,
+      theme: 'grid',
     });
     return doc.output();
   }
