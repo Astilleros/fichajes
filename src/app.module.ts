@@ -11,9 +11,17 @@ import { CalendarsModule } from './calendar/calendar.module';
 import { FilesModule } from './files/files.module';
 import { SignModule } from './sign/sign.module';
 import { CheckinModule } from './checkin/checkin.module';
+import { StripeService } from './stripe/stripe.service';
+import { StripeController } from './stripe/stripe.controller';
+import { StripeModule } from './stripe/stripe.module';
+import { ConfigModule } from '@nestjs/config';
+import { CheckoutsModule } from './stripe/checkouts/checkouts.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MongooseModule.forRoot('mongodb://127.0.0.1/fichajes_db'),
     AuthModule,
     UserModule,
@@ -22,7 +30,9 @@ import { CheckinModule } from './checkin/checkin.module';
     CalendarsModule,
     FilesModule,
     SignModule,
-    CheckinModule
+    CheckinModule,
+    StripeModule,
+    CheckoutsModule,
   ],
   controllers: [AppController],
   providers: [AppService, CalendarService],

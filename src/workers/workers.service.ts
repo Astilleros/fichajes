@@ -294,8 +294,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     });
 
     const row = [];
-    for (let i = 0; i < cols_events; i++) {
-      row[i] = i;
+    for (let i = 1; i <= cols_events; i++) {
+      row[i] = 'Tramo '+i;
     }
     autoTable(doc, {
       head: [['Dia', ...row, 'Horas']],
