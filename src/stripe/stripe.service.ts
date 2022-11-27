@@ -31,7 +31,6 @@ export class StripeService {
       mode: 'payment',
       success_url: this.cfg.get('DOMAIN'),
       cancel_url: this.cfg.get('DOMAIN'),
-      automatic_tax: { enabled: true },
     });
 
     return await this.CheckoutsService.create({
