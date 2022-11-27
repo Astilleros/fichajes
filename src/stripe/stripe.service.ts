@@ -61,7 +61,7 @@ export class StripeService {
 
     checkout_db.status = event.type.split('.')[2];
     console.log(checkout_db);
-    
+
     switch (event.type) {
       case 'checkout.session.completed':
         await this.createOrder(session);

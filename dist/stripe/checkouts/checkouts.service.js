@@ -27,7 +27,7 @@ let CheckoutsService = class CheckoutsService {
     }
     async findOne(session_id) {
         const checkout = await this.CheckoutModel.findOne({
-            'createdRawData.id': session_id,
+            'checkout.id': session_id,
         });
         return checkout;
     }

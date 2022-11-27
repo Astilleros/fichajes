@@ -16,6 +16,7 @@ exports.StripeController = void 0;
 const common_1 = require("@nestjs/common");
 const AuthUser_decorator_1 = require("../auth/decorators/AuthUser.decorator");
 const jwtPayload_dto_1 = require("../auth/dto/jwtPayload.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const stripe_service_1 = require("./stripe.service");
 let StripeController = class StripeController {
     constructor(stripeService) {
@@ -54,6 +55,7 @@ __decorate([
 ], StripeController.prototype, "webhook", null);
 StripeController = __decorate([
     (0, common_1.Controller)('stripe'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [stripe_service_1.StripeService])
 ], StripeController);
 exports.StripeController = StripeController;
