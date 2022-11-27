@@ -18,8 +18,6 @@ import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { AuthUser } from 'src/auth/decorators/AuthUser.decorator';
-import { PassThrough } from 'stream';
-import PdfPrinter from 'pdfmake';
 
 @Controller('workers')
 @UseGuards(JwtAuthGuard)

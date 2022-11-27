@@ -34,6 +34,7 @@ let StripeController = class StripeController {
 };
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload]),
@@ -41,6 +42,7 @@ __decorate([
 ], StripeController.prototype, "list", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload]),
@@ -55,7 +57,6 @@ __decorate([
 ], StripeController.prototype, "webhook", null);
 StripeController = __decorate([
     (0, common_1.Controller)('stripe'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [stripe_service_1.StripeService])
 ], StripeController);
 exports.StripeController = StripeController;

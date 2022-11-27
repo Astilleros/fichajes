@@ -5,16 +5,17 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { StripeService } from './stripe.service';
 
 @Controller('stripe')
-@UseGuards(JwtAuthGuard)
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   list(@AuthUser() user: JwtPayload) {
     return this.stripeService.listCheckouts(user);
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@AuthUser() user: JwtPayload) {
     return this.stripeService.createCheckout(user);
   }
