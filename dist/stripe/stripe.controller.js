@@ -28,8 +28,8 @@ let StripeController = class StripeController {
     create(user) {
         return this.stripeService.createCheckout(user);
     }
-    webhook(request) {
-        return this.stripeService.webhook(request.headers['stripe-signature'], request.body);
+    webhook(req) {
+        return this.stripeService.webhook(req.headers['stripe-signature'], req.rawBody);
     }
 };
 __decorate([
@@ -50,7 +50,7 @@ __decorate([
 ], StripeController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)('webhook'),
-    __param(0, (0, common_1.Request)()),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)

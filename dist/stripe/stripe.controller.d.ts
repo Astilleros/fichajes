@@ -23,6 +23,7 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
+import { RawBodyRequest } from '@nestjs/common';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { StripeService } from './stripe.service';
 export declare class StripeController {
@@ -34,5 +35,5 @@ export declare class StripeController {
     create(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    webhook(request: Request): Promise<void>;
+    webhook(req: RawBodyRequest<Request>): Promise<void>;
 }

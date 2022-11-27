@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, RawBodyRequest, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthUser } from 'src/auth/decorators/AuthUser.decorator';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -21,10 +21,10 @@ export class StripeController {
   }
 
   @Post('webhook')
-  webhook(@Request() request: Request) {
+  webhook(@Req() req: RawBodyRequest<Request>) {
     return this.stripeService.webhook(
-      request.headers['stripe-signature'],
-      request.body,
+      req.headers['stripe-signature'],
+      req.rawBody,
     );
   }
 }
