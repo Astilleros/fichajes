@@ -28,7 +28,7 @@ let StripeService = class StripeService {
         const session = await this.stripe.checkout.sessions.create({
             line_items: [
                 {
-                    price: this.cfg.get('PRICE_ID'),
+                    price: this.cfg.get('PRICE'),
                     quantity: 1,
                 },
             ],
