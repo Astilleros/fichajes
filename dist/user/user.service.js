@@ -29,7 +29,7 @@ let UserService = class UserService {
         return await this.userModel.create(user);
     }
     async findOne(id) {
-        return await this.userModel.findOne({ _id: id }).lean();
+        return await this.userModel.findOne({ _id: id });
     }
     async update(id, updateUserDto) {
         const update = Object.assign({}, updateUserDto);

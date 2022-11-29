@@ -20,7 +20,7 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<UserDocument> {
-    return await this.userModel.findOne({ _id: id }).lean();
+    return await this.userModel.findOne({ _id: id });
   }
 
   async update(
