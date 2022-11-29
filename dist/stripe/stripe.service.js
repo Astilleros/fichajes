@@ -36,7 +36,7 @@ let StripeService = class StripeService {
                 },
             ],
             mode: 'payment',
-            payment_method_types: this.cfg.get('PAYMENT_METHOD_TYPES'),
+            payment_method_types: [this.cfg.get('PAYMENT_METHOD_TYPES')],
             success_url: this.cfg.get('DOMAIN'),
             cancel_url: this.cfg.get('DOMAIN'),
         });
