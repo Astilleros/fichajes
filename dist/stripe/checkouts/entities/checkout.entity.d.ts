@@ -24,12 +24,13 @@
 /// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
 import Stripe from 'stripe';
+import { CheckoutStatus } from './status.enum';
 export type CheckoutDocument = Checkout & Document;
 export declare class Checkout {
     readonly user: string;
     readonly createdAt: Date;
     checkout: Stripe.Checkout.Session;
-    status: string;
+    status: CheckoutStatus;
     confirmedAt: Date;
     cacelledAt: Date;
 }

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckoutSchema = exports.Checkout = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const stripe_1 = require("stripe");
+const status_enum_1 = require("./status.enum");
 let Checkout = class Checkout {
 };
 __decorate([
@@ -27,8 +28,8 @@ __decorate([
     __metadata("design:type", Object)
 ], Checkout.prototype, "checkout", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ enum: status_enum_1.CheckoutStatus, default: status_enum_1.CheckoutStatus.pristine }),
+    __metadata("design:type", Number)
 ], Checkout.prototype, "status", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),

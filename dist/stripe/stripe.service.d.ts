@@ -25,22 +25,25 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import { UserService } from 'src/user/user.service';
 import Stripe from 'stripe';
 import { CheckoutsService } from './checkouts/checkouts.service';
+import { CheckoutDocument } from './checkouts/entities/checkout.entity';
 export declare class StripeService {
     private cfg;
     private CheckoutsService;
+    private UserService;
     private stripe;
     private webhook_secret;
-    constructor(cfg: ConfigService, CheckoutsService: CheckoutsService);
-    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    constructor(cfg: ConfigService, CheckoutsService: CheckoutsService, UserService: UserService);
+    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
     webhook(sig: string, body: any): Promise<void>;
-    createOrder(session: Stripe.Checkout.Session): Promise<void>;
-    fulfillOrder(session: Stripe.Checkout.Session): Promise<void>;
-    emailCustomerAboutFailedPayment(session: Stripe.Checkout.Session): Promise<void>;
+    createOrder(session: Stripe.Checkout.Session, checkout_db: CheckoutDocument): Promise<void>;
+    fulfillOrder(session: Stripe.Checkout.Session, checkout_db: CheckoutDocument): Promise<void>;
+    emailCustomerAboutFailedPayment(session: Stripe.Checkout.Session, checkout_db: CheckoutDocument): Promise<void>;
 }

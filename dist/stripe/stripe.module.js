@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const stripe_service_1 = require("./stripe.service");
 const stripe_controller_1 = require("./stripe.controller");
 const checkouts_module_1 = require("./checkouts/checkouts.module");
+const user_module_1 = require("../user/user.module");
 let StripeModule = class StripeModule {
 };
 StripeModule = __decorate([
@@ -18,7 +19,7 @@ StripeModule = __decorate([
         controllers: [stripe_controller_1.StripeController],
         providers: [stripe_service_1.StripeService],
         exports: [stripe_service_1.StripeService],
-        imports: [checkouts_module_1.CheckoutsModule]
+        imports: [checkouts_module_1.CheckoutsModule, user_module_1.UserModule],
     })
 ], StripeModule);
 exports.StripeModule = StripeModule;

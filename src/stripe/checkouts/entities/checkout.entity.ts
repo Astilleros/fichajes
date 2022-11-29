@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import Stripe from 'stripe';
+import { CheckoutStatus } from './status.enum';
 
 export type CheckoutDocument = Checkout & Document;
 
@@ -17,8 +18,8 @@ export class Checkout {
   @Prop({ type: Object })
   checkout: Stripe.Checkout.Session;
 
-  @Prop()
-  status: string;
+  @Prop({ enum: CheckoutStatus, default: CheckoutStatus.pristine })
+  status: CheckoutStatus;
 
   @Prop()
   confirmedAt: Date;

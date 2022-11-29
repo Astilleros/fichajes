@@ -43,5 +43,8 @@ export class User {
 
   @Prop({ required: true })
   readonly sede: string;
+
+  @Prop({ default: new Date() })
+  licensedUntil: Date;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

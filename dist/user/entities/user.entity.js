@@ -61,6 +61,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "sede", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: new Date() }),
+    __metadata("design:type", Date)
+], User.prototype, "licensedUntil", void 0);
 User = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

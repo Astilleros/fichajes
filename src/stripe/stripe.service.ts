@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import { UserService } from 'src/user/user.service';
 import Stripe from 'stripe';
 import { CheckoutsService } from './checkouts/checkouts.service';
+import { CheckoutDocument } from './checkouts/entities/checkout.entity';
+import { CheckoutStatus } from './checkouts/entities/status.enum';
 
 @Injectable()
 export class StripeService {
@@ -12,6 +15,7 @@ export class StripeService {
   constructor(
     private cfg: ConfigService,
     private CheckoutsService: CheckoutsService,
+    private UserService: UserService,
   ) {
     console.log(cfg.get('STRIPE_SECRET_KEY'));
     this.webhook_secret = cfg.get('STRIPE_WEBHOOK_SECRET');
@@ -29,6 +33,7 @@ export class StripeService {
         },
       ],
       mode: 'payment',
+      payment_method_types: this.cfg.get('PAYMENT_METHOD_TYPES'),
       success_url: this.cfg.get('DOMAIN'),
       cancel_url: this.cfg.get('DOMAIN'),
     });
@@ -58,40 +63,63 @@ export class StripeService {
     const checkout_db = await this.CheckoutsService.findOne(session.id);
     if (!checkout_db) return;
 
-    checkout_db.status = event.type.split('.')[2];
-    console.log(checkout_db);
-
     switch (event.type) {
       case 'checkout.session.completed':
-        await this.createOrder(session);
-        if (session.payment_status === 'paid') await this.fulfillOrder(session);
+        await this.createOrder(session, checkout_db);
+        checkout_db.status = CheckoutStatus.pending;
+        if (session.payment_status === 'paid') {
+          await this.fulfillOrder(session, checkout_db);
+          checkout_db.status = CheckoutStatus.completed;
+        }
         break;
       case 'checkout.session.async_payment_succeeded':
-        await this.fulfillOrder(session);
+        await this.fulfillOrder(session, checkout_db);
+        checkout_db.status = CheckoutStatus.completed;
         break;
       case 'checkout.session.expired':
-        await this.emailCustomerAboutFailedPayment(session);
+        await this.emailCustomerAboutFailedPayment(session, checkout_db);
+        checkout_db.status = CheckoutStatus.failure;
         break;
       case 'checkout.session.async_payment_failed':
-        await this.emailCustomerAboutFailedPayment(session);
+        await this.emailCustomerAboutFailedPayment(session, checkout_db);
+        checkout_db.status = CheckoutStatus.failure;
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
+        return;
     }
     await checkout_db.save();
   }
 
-  async createOrder(session: Stripe.Checkout.Session) {
-    // TODO: COMPLETADO PROCESO POR USUARIO
+  async createOrder(
+    session: Stripe.Checkout.Session,
+    checkout_db: CheckoutDocument,
+  ) {
+    // EMAIL DE COMPLETA LA COMPRA PAGANDO
     console.log('Creating order', session);
   }
 
-  async fulfillOrder(session: Stripe.Checkout.Session) {
-    // TODO: PAGO RECIBIDO DEFINITIVO
+  async fulfillOrder(
+    session: Stripe.Checkout.Session,
+    checkout_db: CheckoutDocument,
+  ) {
     console.log('Fulfilling order', session);
+    // EMAIL DE PAGO RECIBIDO
+    // SUMAR 1 año A LA SUBSCRIPCION
+    const user = await this.UserService.findOne(checkout_db.user);
+    if (!user.licensedUntil) {
+      user.licensedUntil = new Date();
+    }
+    const until = new Date(user.licensedUntil);
+    until.setFullYear(until.getFullYear() + 1);
+    user.licensedUntil = until;
+    await user.save();
   }
 
-  async emailCustomerAboutFailedPayment(session: Stripe.Checkout.Session) {
+  async emailCustomerAboutFailedPayment(
+    session: Stripe.Checkout.Session,
+    checkout_db: CheckoutDocument,
+  ) {
     // TODO: SESSION CANCELADA
     console.log('Emailing customer', session);
   }
