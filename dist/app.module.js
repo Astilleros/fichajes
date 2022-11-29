@@ -30,6 +30,7 @@ AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+                envFilePath: __dirname + '/.env',
             }),
             mongoose_1.MongooseModule.forRoot('mongodb://127.0.0.1/fichajes_db'),
             auth_module_1.AuthModule,

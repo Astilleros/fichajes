@@ -21,6 +21,7 @@ import { CheckoutsModule } from './stripe/checkouts/checkouts.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: __dirname+ '/.env',
     }),
     MongooseModule.forRoot('mongodb://127.0.0.1/fichajes_db'),
     AuthModule,

@@ -37,6 +37,6 @@ export declare class User {
     readonly empresa: string;
     readonly cif: string;
     readonly sede: string;
-    licensedUntil: Date;
+    licensedUntil: Date | null;
 }
 export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any, any>, {}, {}, {}, {}, "type", User>;
