@@ -199,7 +199,10 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     start: string,
     end: string,
   ) {
+    console.log('generatePdfToSign',start, end);
+    
     const startD = new Date(start)
+    const startM = new Date(startD.getTime()+ 1)
     const endD = new Date(end)
     const endM = new Date(endD.getTime() -1)
 
@@ -229,8 +232,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
           'Seguridad social: ' + worker.seguridad_social,
         ],
         [
-          'Fecha inicio: ' +  pad2z(startD.getDate()) +'-'+ pad2z(startD.getMonth()+1) +'-'+startD.getFullYear(),
-          'Fecha fin: ' +  pad2z(endM.getDate()) +'-'+ pad2z(endM.getMonth()+1) +'-'+endM.getFullYear()
+          'Fecha inicio: ' +  pad2z(startM.getDate()) +'-'+ pad2z(startM.getMonth()+1) +'-'+ startM.getFullYear(),
+          'Fecha fin: ' +  pad2z(endM.getDate()) +'-'+ pad2z(endM.getMonth()+1) +'-'+ endM.getFullYear()
         ]
       ],
       startY: 5,
