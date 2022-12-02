@@ -156,7 +156,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return await w.save();
     }
     async generatePdfToSign(userJwt, worker_id, start, end) {
+        console.log('generatePdfToSign', start, end);
         const startD = new Date(start);
+        const startM = new Date(startD.getTime() + 1);
         const endD = new Date(end);
         const endM = new Date(endD.getTime() - 1);
         const user = await this.userService.findOne(userJwt._id);
@@ -178,7 +180,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                     'Seguridad social: ' + worker.seguridad_social,
                 ],
                 [
-                    'Fecha inicio: ' + pad2z(startD.getDate()) + '-' + pad2z(startD.getMonth() + 1) + '-' + startD.getFullYear(),
+                    'Fecha inicio: ' + pad2z(startM.getDate()) + '-' + pad2z(startM.getMonth() + 1) + '-' + startM.getFullYear(),
                     'Fecha fin: ' + pad2z(endM.getDate()) + '-' + pad2z(endM.getMonth() + 1) + '-' + endM.getFullYear()
                 ]
             ],
@@ -236,7 +238,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             body.push([pad2z(key), ...row, hours]);
         });
         const row = [];
-        for (let i = 0; i <= cols_events; i++) {
+        for (let i = 0; i < cols_events; i++) {
             row[i] = 'Tramo ' + (i + 1);
         }
         (0, jspdf_autotable_1.default)(doc, {
