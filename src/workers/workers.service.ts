@@ -264,6 +264,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       if (base[start.getDate()].length > cols_events)
         cols_events = base[start.getDate()].length;
     }
+
     console.log(cols_events);
 
     Object.keys(base).map((key) => {
@@ -294,8 +295,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     });
 
     const row = [];
-    for (let i = 1; i <= cols_events; i++) {
-      row[i] = 'Tramo '+i;
+    for (let i = 0; i <= cols_events; i++) {
+      row[i] = 'Tramo '+ (i+1);
     }
     autoTable(doc, {
       head: [['Dia', ...row, 'Horas']],

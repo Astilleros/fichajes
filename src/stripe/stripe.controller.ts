@@ -21,6 +21,7 @@ export class StripeController {
     return this.stripeService.listCheckouts(user);
   }
 
+  // TO DO FALTAN REMOVE 
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@AuthUser() user: JwtPayload) {

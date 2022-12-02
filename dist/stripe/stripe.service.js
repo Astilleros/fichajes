@@ -28,6 +28,7 @@ let StripeService = class StripeService {
         });
     }
     async createCheckout(user) {
+        const activeOld = await this.CheckoutsService.findAll;
         const session = await this.stripe.checkout.sessions.create({
             line_items: [
                 {

@@ -25,6 +25,8 @@ export class StripeService {
   }
 
   async createCheckout(user: JwtPayload) {
+    const activeOld = await this.CheckoutsService.findAll
+
     const session = await this.stripe.checkout.sessions.create({
       line_items: [
         {

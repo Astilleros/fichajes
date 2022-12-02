@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const checkout_entity_1 = require("./entities/checkout.entity");
+const status_enum_1 = require("./entities/status.enum");
 let CheckoutsService = class CheckoutsService {
     constructor(CheckoutModel) {
         this.CheckoutModel = CheckoutModel;
@@ -40,7 +41,10 @@ let CheckoutsService = class CheckoutsService {
         return checkout;
     }
     async remove(_id) {
-        return await this.CheckoutModel.deleteOne({ _id });
+        return await this.CheckoutModel.deleteOne({
+            _id,
+            status: { $ne: status_enum_1.CheckoutStatus.completed },
+        });
     }
 };
 CheckoutsService = __decorate([

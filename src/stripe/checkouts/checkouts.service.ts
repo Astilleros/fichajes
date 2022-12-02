@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { UpdateCheckoutDto } from './dto/update-checkout.dto';
 import { Checkout, CheckoutDocument } from './entities/checkout.entity';
+import { CheckoutStatus } from './entities/status.enum';
 
 @Injectable()
 export class CheckoutsService {
@@ -39,6 +40,9 @@ export class CheckoutsService {
   }
 
   async remove(_id: string) {
-    return await this.CheckoutModel.deleteOne({ _id });
+    return await this.CheckoutModel.deleteOne({
+      _id,
+      status: { $ne: CheckoutStatus.completed },
+    });
   }
 }
