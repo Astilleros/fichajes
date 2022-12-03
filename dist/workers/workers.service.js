@@ -238,7 +238,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
             body.push([pad2z(key), ...row, hours]);
         });
         const row = [];
-        for (let i = 0; i < cols_events; i++) {
+        for (let i = 0; i <= cols_events; i++) {
             row[i] = 'Tramo ' + (i + 1);
         }
         (0, jspdf_autotable_1.default)(doc, {

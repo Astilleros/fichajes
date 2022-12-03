@@ -14,11 +14,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalendarController = void 0;
 const common_1 = require("@nestjs/common");
-const workers_service_1 = require("../workers/workers.service");
 const calendar_service_1 = require("./calendar.service");
+const workers_service_1 = require("../workers/workers.service");
 let CalendarController = class CalendarController {
-    constructor(calendarService, workersService) {
-        this.calendarService = calendarService;
+    constructor(CalendarService, workersService) {
+        this.CalendarService = CalendarService;
         this.workersService = workersService;
     }
     async watch(req) {
@@ -42,7 +42,7 @@ let CalendarController = class CalendarController {
             await worker.save();
         }
         console.log('worker', worker);
-        const new_events = await this.calendarService.getChanges(calendarId, worker.sync);
+        const new_events = await this.CalendarService.getChanges(calendarId, worker.sync);
         let last_updated = 0;
         for (let i = 0; i < new_events.length; i++) {
             const e = new_events[i];
@@ -54,7 +54,25 @@ let CalendarController = class CalendarController {
         }
         const sync = new Date(last_updated).toISOString();
         console.log('new sync', sync);
-        await this.workersService.update(worker.user, worker._id, { sync, locked: false });
+        await this.workersService.update(worker.user, worker._id, {
+            sync,
+            locked: false,
+        });
+    }
+    async list() {
+        const calendars = await this.CalendarService.getCalendars();
+        for (let i = 0; i < calendars.length; i++) {
+            const c = calendars[i];
+            c.shared = await this.CalendarService.getSharedAccounts(c.id);
+            c.user = await this.workersService.getWorkerByCalendar(c.id);
+        }
+        return calendars;
+    }
+    async deleteCalendar(calendarId) {
+        return await this.CalendarService.deleteCalendar(calendarId);
+    }
+    async deleteAcl(calendarId, aclId) {
+        return await this.CalendarService.deleteAcl(calendarId, aclId);
     }
 };
 __decorate([
@@ -64,6 +82,27 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], CalendarController.prototype, "watch", null);
+__decorate([
+    (0, common_1.Get)('list'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "list", null);
+__decorate([
+    (0, common_1.Delete)(':calendarId'),
+    __param(0, (0, common_1.Param)('calendarId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "deleteCalendar", null);
+__decorate([
+    (0, common_1.Delete)('acl/:calendarId/:aclId'),
+    __param(0, (0, common_1.Param)('calendarId')),
+    __param(1, (0, common_1.Param)('aclId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], CalendarController.prototype, "deleteAcl", null);
 CalendarController = __decorate([
     (0, common_1.Controller)('calendar'),
     __metadata("design:paramtypes", [calendar_service_1.CalendarService,

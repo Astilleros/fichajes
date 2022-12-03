@@ -27,7 +27,7 @@ export class CalendarService {
   // CALENDARIOS
   async getCalendars() {
     const response = await this.client.calendarList.list();
-    return response.data;
+    return response.data.items;
   }
 
   async watchCalendarEvents(calendarId: calendar_v3.Schema$Calendar['id']) {
@@ -73,8 +73,7 @@ export class CalendarService {
 
   async getSharedAccounts(calendarId: string) {
     const all = await this.client.acl.list({ calendarId });
-    const response = all.data.items?.filter((i: any) => i.role != 'owner');
-    return response;
+    return all.data.items;
   }
 
   async unshareCalendar(calendarId: string, googleAccount: string) {
@@ -90,6 +89,15 @@ export class CalendarService {
     return;
   }
 
+  async deleteAcl(calendarId: string, aclId: string) {
+    const list_acl = await this.getSharedAccounts(calendarId);
+    if (!list_acl.length) return;
+    return await this.client.acl.delete({
+      calendarId,
+      ruleId: aclId,
+    });
+  }
+
   async deleteCalendar(calendarId: string) {
     const response = await this.client.calendars.delete({ calendarId });
     return response.data;
@@ -97,9 +105,9 @@ export class CalendarService {
 
   async clearCalendarList() {
     const calendars = await this.getCalendars();
-    if (!calendars?.items?.length) return;
-    for (let i = 0; i < calendars.items.length; i++) {
-      const calendar = calendars.items[i];
+    if (!calendars?.length) return;
+    for (let i = 0; i < calendars.length; i++) {
+      const calendar = calendars[i];
       if (!calendar.id) continue;
       await this.deleteCalendar(calendar.id);
       await new Promise((res: any) => setTimeout(res, 1000));
@@ -138,8 +146,8 @@ export class CalendarService {
       updatedMin,
       singleEvents: false,
       showDeleted: false,
-      showHiddenInvitations: false
-    }
+      showHiddenInvitations: false,
+    };
     const response = await this.client.events.list(options);
     return response.data.items;
   }

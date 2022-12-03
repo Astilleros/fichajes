@@ -26,7 +26,7 @@ let CalendarService = class CalendarService {
     }
     async getCalendars() {
         const response = await this.client.calendarList.list();
-        return response.data;
+        return response.data.items;
     }
     async watchCalendarEvents(calendarId) {
         console.log(calendarId);
@@ -61,10 +61,8 @@ let CalendarService = class CalendarService {
         return this.getCalendarUrl(calendarId);
     }
     async getSharedAccounts(calendarId) {
-        var _a;
         const all = await this.client.acl.list({ calendarId });
-        const response = (_a = all.data.items) === null || _a === void 0 ? void 0 : _a.filter((i) => i.role != 'owner');
-        return response;
+        return all.data.items;
     }
     async unshareCalendar(calendarId, googleAccount) {
         const list_acl = await this.getSharedAccounts(calendarId);
@@ -77,17 +75,25 @@ let CalendarService = class CalendarService {
         });
         return;
     }
+    async deleteAcl(calendarId, aclId) {
+        const list_acl = await this.getSharedAccounts(calendarId);
+        if (!list_acl.length)
+            return;
+        return await this.client.acl.delete({
+            calendarId,
+            ruleId: aclId,
+        });
+    }
     async deleteCalendar(calendarId) {
         const response = await this.client.calendars.delete({ calendarId });
         return response.data;
     }
     async clearCalendarList() {
-        var _a;
         const calendars = await this.getCalendars();
-        if (!((_a = calendars === null || calendars === void 0 ? void 0 : calendars.items) === null || _a === void 0 ? void 0 : _a.length))
+        if (!(calendars === null || calendars === void 0 ? void 0 : calendars.length))
             return;
-        for (let i = 0; i < calendars.items.length; i++) {
-            const calendar = calendars.items[i];
+        for (let i = 0; i < calendars.length; i++) {
+            const calendar = calendars[i];
             if (!calendar.id)
                 continue;
             await this.deleteCalendar(calendar.id);
@@ -123,7 +129,7 @@ let CalendarService = class CalendarService {
             updatedMin,
             singleEvents: false,
             showDeleted: false,
-            showHiddenInvitations: false
+            showHiddenInvitations: false,
         };
         const response = await this.client.events.list(options);
         return response.data.items;
