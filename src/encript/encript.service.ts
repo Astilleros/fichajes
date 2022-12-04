@@ -4,12 +4,11 @@ const saltOrRounds = 10;
 
 @Injectable()
 export class EncriptService {
-    constructor(){}
-    async hashUserPassword(password: string): Promise<string> {
-        return await bcrypt.hash(password, saltOrRounds);
-    }
+  async hashUserPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, saltOrRounds);
+  }
 
-    async comparePasswords(raw:string, db: string): Promise<boolean> {
-        return await bcrypt.compare(raw, db)
-    }
+  async comparePasswords(raw: string, db: string): Promise<boolean> {
+    return await bcrypt.compare(raw, db);
+  }
 }

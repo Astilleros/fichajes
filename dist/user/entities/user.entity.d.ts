@@ -26,7 +26,7 @@ import { Document } from 'mongoose';
 export type UserDocument = User & Document;
 export declare class User {
     readonly username: string;
-    readonly password: string;
+    password: string;
     readonly nombre: string;
     readonly email: string;
     readonly mobile: string;

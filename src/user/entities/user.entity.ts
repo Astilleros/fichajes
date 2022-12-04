@@ -12,7 +12,7 @@ export class User {
   readonly username: string;
 
   @Prop({ select: false })
-  readonly password: string;
+  password: string;
 
   @Prop({ required: true })
   readonly nombre: string;

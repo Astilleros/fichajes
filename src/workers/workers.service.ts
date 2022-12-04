@@ -16,6 +16,7 @@ import { FilesService } from 'src/files/files.service';
 import { CheckinService } from 'src/checkin/checkin.service';
 import { SignService } from 'src/sign/sign.service';
 import { workerModes } from './dto/mode.enum';
+import { DateTime, Interval } from 'luxon';
 
 @Injectable()
 export class WorkersService {
@@ -81,8 +82,8 @@ export class WorkersService {
 
   async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
     const worker = await this.workerModel.findById(_id);
-    
-    if (updateWorkerDto.mode && updateWorkerDto.mode !== worker.mode) {
+
+    if (updateWorkerDto.mode !== worker.mode) {
       const editMode = await this.changeMode(
         user_id,
         worker._id,
@@ -90,7 +91,7 @@ export class WorkersService {
       );
       updateWorkerDto.mode = editMode.mode;
     }
-    
+
     return this.workerModel
       .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
       .exec();
@@ -169,151 +170,133 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       _id: worker_id,
       user: user_id,
     });
-
+    
     if (w.mode === new_mode) return w;
-
     if (new_mode === workerModes.none)
       await this.calendarService.unshareCalendar(w.calendar, w.email);
-
     if (new_mode === workerModes.place) {
       if (w.mode !== workerModes.none)
         await this.calendarService.unshareCalendar(w.calendar, w.email);
       await this.calendarService.shareCalendar(w.calendar, w.email, 'reader');
     }
-
-    if (new_mode > workerModes.place) {
-      if(w.mode === workerModes.place)
+    if (new_mode === workerModes.open) {
+      if (w.mode === workerModes.place)
         await this.calendarService.unshareCalendar(w.calendar, w.email);
       await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
     }
 
-    console.log('a',w.mode);
     w.mode = new_mode;
-    console.log('b',w.mode);
     return await w.save();
   }
 
   async generatePdfToSign(
-    userJwt: JwtPayload,
+    jwt: JwtPayload,
     worker_id: string,
     start: string,
     end: string,
   ) {
-    console.log('generatePdfToSign',start, end);
-    
-    const startD = new Date(start)
-    const startM = new Date(startD.getTime()+ 1)
-    const endD = new Date(end)
-    const endM = new Date(endD.getTime() -1)
 
-    const user = await this.userService.findOne(userJwt._id);
-    const worker = await this.findOne(userJwt._id, worker_id);
+    const dateStart = DateTime.fromISO(start);
+    const dateEnd = DateTime.fromISO(end);
+    const user = await this.userService.findOne(jwt._id);
+    const worker = await this.findOne(jwt._id, worker_id);
     const events = await this.filterEvents(
-      userJwt,
+      jwt,
       worker_id,
-      startD.toISOString(),
-      endD.toISOString(),
+      dateStart.toISO(),
+      dateEnd.toISO(),
     );
-    console.log(events.length);
 
     const doc: any = new jsPDF({});
     autoTable(doc, {
-      
-      head: [],
+      head: [['Trabajador', '', '']],
       body: [
         [
-          'Empresa: ' + user.empresa,
-          'CIF: ' + user.cif,
-          'Sede social: ' + user.sede,
-        ],
-        [
-          'Trabajador: ' + worker.name,
+          'Nombre: ' + worker.name,
           'Dni: ' + worker.dni,
           'Seguridad social: ' + worker.seguridad_social,
         ],
-        [
-          'Fecha inicio: ' +  pad2z(startM.getDate()) +'-'+ pad2z(startM.getMonth()+1) +'-'+ startM.getFullYear(),
-          'Fecha fin: ' +  pad2z(endM.getDate()) +'-'+ pad2z(endM.getMonth()+1) +'-'+ endM.getFullYear()
-        ]
       ],
-      startY: 5,
+      startY: 6,
+      theme: 'grid',
+    });
+    autoTable(doc, {
+      head: [['Empresa', '', '']],
+      body: [
+        ['Nombre: ' + user.empresa, 'CIF: ' + user.cif, 'Sede: ' + user.sede]
+      ],
+      startY: doc.lastAutoTable.finalY + 1,
+      theme: 'grid',
+    });
+    autoTable(doc, {
+      head: [['Periodo registrado', '']],
+      body: [
+        [
+          `desde dia ${dateStart.toFormat('dd/MM/yyyy')} a las ${dateStart.toFormat('HH:mm')} horas`,
+          `hasta dia ${dateEnd.toFormat('dd/MM/yyyy')} a las ${dateEnd.toFormat('HH:mm')} horas`
+        ],
+      ],
+      startY: doc.lastAutoTable.finalY + 1,
       theme: 'grid',
     });
 
     const body: any = [];
-    const days = Math.round(
-      (new Date(end).getTime() / 1000 - new Date(start).getTime() / 1000) /
-        (24 * 60 * 60),
-    );
-    console.log(days);
 
-    const base: any = {};
     let cols_events = 0;
-    let total_hours = 0;
-    let total_days = 0;
-    for (let i = new Date(start).getDate(); i <= days; i++) {
-      base[i] = [];
-    }
-
-    console.log(JSON.stringify(base, null, 2));
-
+    const base: any = {};
     for (let i = 0; i < events.length; i++) {
       const e = events[i];
-
       if (!e.start.dateTime || !e.end.dateTime) continue;
-      const start = new Date(e.start.dateTime);
-      if (!base[start.getDate()]) base[start.getDate()] = [];
-      base[start.getDate()].push(e);
-      if (base[start.getDate()].length > cols_events)
-        cols_events = base[start.getDate()].length;
+      const base_i = DateTime.fromISO(e.start.dateTime).toFormat('dd/MM/yyyy')
+      if (!base[base_i]) base[base_i] = [];
+      base[base_i].push(e);
+      if (base[base_i].length > cols_events) cols_events = base[base_i].length;
     }
 
-    console.log(cols_events);
+    const default_row = []
+    for (let i = 0; i < cols_events; i++) {
+      default_row.push('')
+    }
 
+    let total_hours = 0;
+    let total_days = 0;
     Object.keys(base).map((key) => {
       const events = base[key];
       if (events.length === 0) return;
       total_days++;
       let hours = 0;
-      const row = [];
-      for (let i = 0; i < cols_events; i++) {
-        const e = events[i];
-        if (!e || !e.start || !e.end) {
-          row[i] = '';
-          continue;
-        }
-        const start_au = new Date(e.start.dateTime);
-        const end_au = new Date(e.end.dateTime);
-        const s_h = e.start.dateTime.slice(11, 13);
-        const e_h = e.end.dateTime.slice(11, 13);
-        const s_m = e.start.dateTime.slice(14, 16);
-        const e_m = e.end.dateTime.slice(14, 16);
-        row[i] = `${s_h}:${s_m} - ${e_h}:${e_m}`;
-        hours += (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
-        total_hours +=
-          (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
-      }
+      const row = [...default_row];
 
+      //
+      for (let i = 0; i < events.length; i++) {
+        const e = events[i];
+        const timeStart = DateTime.fromISO(e.start.dateTime)
+        const timeEnd = DateTime.fromISO(e.end.dateTime)
+        row[i] = `${timeStart.toFormat('HH:mm')} - ${timeEnd.toFormat('HH:mm')}`
+        const interval = (timeEnd.toUnixInteger() - timeStart.toUnixInteger()) / 3600;
+        hours += interval
+        total_hours += interval
+      }
       body.push([pad2z(key), ...row, hours]);
     });
 
-    const row = [];
-    for (let i = 0; i <= cols_events; i++) {
-      row[i] = 'Tramo '+ (i+1);
+    const head = ['Dia','Horas'];
+    for (let i = 1; i <= cols_events; i++) {
+      head.splice(i,0, `Tramo ${i}`)
     }
     autoTable(doc, {
-      head: [['Dia', ...row, 'Horas']],
+      head: [head],
       body,
-      startY: doc.lastAutoTable.finalY,
+      startY: doc.lastAutoTable.finalY + 1,
       theme: 'grid',
     });
     autoTable(doc, {
-      head: [],
+      head: [['Resumen', '']],
       body: [
         ['Total horas: ' + total_hours, 'Total dias: ' + total_days],
         ['Firma Trabajador\n\n', 'Empresa\n\n'],
       ],
-      startY: doc.lastAutoTable.finalY,
+      startY: doc.lastAutoTable.finalY + 1,
       theme: 'grid',
     });
     return doc.output();
@@ -348,7 +331,6 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       if (e.summary === '@salida') return this.comandoSalida(worker, e);
       if (e.summary === '@firmar') return this.comandoFirmar(worker, e);
     }
-
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {

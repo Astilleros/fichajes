@@ -21,7 +21,7 @@ CheckinModule = __decorate([
         ],
         controllers: [checkin_controller_1.CheckinController],
         providers: [checkin_service_1.CheckinService],
-        exports: [checkin_service_1.CheckinService]
+        exports: [checkin_service_1.CheckinService],
     })
 ], CheckinModule);
 exports.CheckinModule = CheckinModule;

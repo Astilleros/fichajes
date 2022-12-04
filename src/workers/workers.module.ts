@@ -15,7 +15,7 @@ import { SignModule } from 'src/sign/sign.module';
     UserModule,
     FilesModule,
     CheckinModule,
-    SignModule
+    SignModule,
   ],
   controllers: [WorkersController],
   providers: [WorkersService, CalendarService],

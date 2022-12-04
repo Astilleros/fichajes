@@ -31,7 +31,6 @@ export class CalendarService {
   }
 
   async watchCalendarEvents(calendarId: calendar_v3.Schema$Calendar['id']) {
-    console.log(calendarId);
 
     const watchResponse = await this.client.events.watch({
       requestBody: {
@@ -41,7 +40,7 @@ export class CalendarService {
       },
       calendarId,
     });
-    console.log('watchResponse: ', watchResponse.data);
+    return watchResponse;
   }
 
   async createCalendar(calendarData: calendar_v3.Schema$Calendar) {

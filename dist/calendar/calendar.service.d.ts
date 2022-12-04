@@ -3,7 +3,7 @@ export declare class CalendarService {
     private client;
     constructor();
     getCalendars(): Promise<calendar_v3.Schema$CalendarListEntry[]>;
-    watchCalendarEvents(calendarId: calendar_v3.Schema$Calendar['id']): Promise<void>;
+    watchCalendarEvents(calendarId: calendar_v3.Schema$Calendar['id']): Promise<import("gaxios").GaxiosResponse<calendar_v3.Schema$Channel>>;
     createCalendar(calendarData: calendar_v3.Schema$Calendar): Promise<calendar_v3.Schema$Calendar>;
     shareCalendar(calendarId: string, googleAccount: string, role?: 'writer' | 'reader'): Promise<string>;
     getSharedAccounts(calendarId: string): Promise<calendar_v3.Schema$AclRule[]>;

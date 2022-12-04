@@ -8,5 +8,4 @@ export class CreateCheckoutDto {
   confirmedAt?: Date;
 
   cacelledAt?: Date;
-  
 }

@@ -26,6 +26,7 @@ const files_service_1 = require("../files/files.service");
 const checkin_service_1 = require("../checkin/checkin.service");
 const sign_service_1 = require("../sign/sign.service");
 const mode_enum_1 = require("./dto/mode.enum");
+const luxon_1 = require("luxon");
 let WorkersService = class WorkersService {
     constructor(workerModel, calendarService, FilesService, userService, CheckinService, SignService) {
         this.workerModel = workerModel;
@@ -73,7 +74,7 @@ let WorkersService = class WorkersService {
     }
     async update(user_id, _id, updateWorkerDto) {
         const worker = await this.workerModel.findById(_id);
-        if (updateWorkerDto.mode && updateWorkerDto.mode !== worker.mode) {
+        if (updateWorkerDto.mode !== worker.mode) {
             const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode);
             updateWorkerDto.mode = editMode.mode;
         }
@@ -145,115 +146,107 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 await this.calendarService.unshareCalendar(w.calendar, w.email);
             await this.calendarService.shareCalendar(w.calendar, w.email, 'reader');
         }
-        if (new_mode > mode_enum_1.workerModes.place) {
+        if (new_mode === mode_enum_1.workerModes.open) {
             if (w.mode === mode_enum_1.workerModes.place)
                 await this.calendarService.unshareCalendar(w.calendar, w.email);
             await this.calendarService.shareCalendar(w.calendar, w.email, 'writer');
         }
-        console.log('a', w.mode);
         w.mode = new_mode;
-        console.log('b', w.mode);
         return await w.save();
     }
-    async generatePdfToSign(userJwt, worker_id, start, end) {
-        console.log('generatePdfToSign', start, end);
-        const startD = new Date(start);
-        const startM = new Date(startD.getTime() + 1);
-        const endD = new Date(end);
-        const endM = new Date(endD.getTime() - 1);
-        const user = await this.userService.findOne(userJwt._id);
-        const worker = await this.findOne(userJwt._id, worker_id);
-        const events = await this.filterEvents(userJwt, worker_id, startD.toISOString(), endD.toISOString());
-        console.log(events.length);
+    async generatePdfToSign(jwt, worker_id, start, end) {
+        const dateStart = luxon_1.DateTime.fromISO(start);
+        const dateEnd = luxon_1.DateTime.fromISO(end);
+        const user = await this.userService.findOne(jwt._id);
+        const worker = await this.findOne(jwt._id, worker_id);
+        const events = await this.filterEvents(jwt, worker_id, dateStart.toISO(), dateEnd.toISO());
         const doc = new jspdf_1.jsPDF({});
         (0, jspdf_autotable_1.default)(doc, {
-            head: [],
+            head: [['Trabajador', '', '']],
             body: [
                 [
-                    'Empresa: ' + user.empresa,
-                    'CIF: ' + user.cif,
-                    'Sede social: ' + user.sede,
-                ],
-                [
-                    'Trabajador: ' + worker.name,
+                    'Nombre: ' + worker.name,
                     'Dni: ' + worker.dni,
                     'Seguridad social: ' + worker.seguridad_social,
                 ],
-                [
-                    'Fecha inicio: ' + pad2z(startM.getDate()) + '-' + pad2z(startM.getMonth() + 1) + '-' + startM.getFullYear(),
-                    'Fecha fin: ' + pad2z(endM.getDate()) + '-' + pad2z(endM.getMonth() + 1) + '-' + endM.getFullYear()
-                ]
             ],
-            startY: 5,
+            startY: 6,
+            theme: 'grid',
+        });
+        (0, jspdf_autotable_1.default)(doc, {
+            head: [['Empresa', '', '']],
+            body: [
+                ['Nombre: ' + user.empresa, 'CIF: ' + user.cif, 'Sede: ' + user.sede]
+            ],
+            startY: doc.lastAutoTable.finalY + 1,
+            theme: 'grid',
+        });
+        (0, jspdf_autotable_1.default)(doc, {
+            head: [['Periodo registrado', '']],
+            body: [
+                [
+                    `desde dia ${dateStart.toFormat('dd/MM/yyyy')} a las ${dateStart.toFormat('HH:mm')} horas`,
+                    `hasta dia ${dateEnd.toFormat('dd/MM/yyyy')} a las ${dateEnd.toFormat('HH:mm')} horas`
+                ],
+            ],
+            startY: doc.lastAutoTable.finalY + 1,
             theme: 'grid',
         });
         const body = [];
-        const days = Math.round((new Date(end).getTime() / 1000 - new Date(start).getTime() / 1000) /
-            (24 * 60 * 60));
-        console.log(days);
-        const base = {};
         let cols_events = 0;
-        let total_hours = 0;
-        let total_days = 0;
-        for (let i = new Date(start).getDate(); i <= days; i++) {
-            base[i] = [];
-        }
-        console.log(JSON.stringify(base, null, 2));
+        const base = {};
         for (let i = 0; i < events.length; i++) {
             const e = events[i];
             if (!e.start.dateTime || !e.end.dateTime)
                 continue;
-            const start = new Date(e.start.dateTime);
-            if (!base[start.getDate()])
-                base[start.getDate()] = [];
-            base[start.getDate()].push(e);
-            if (base[start.getDate()].length > cols_events)
-                cols_events = base[start.getDate()].length;
+            const base_i = luxon_1.DateTime.fromISO(e.start.dateTime).toFormat('dd/MM/yyyy');
+            if (!base[base_i])
+                base[base_i] = [];
+            base[base_i].push(e);
+            if (base[base_i].length > cols_events)
+                cols_events = base[base_i].length;
         }
-        console.log(cols_events);
+        const default_row = [];
+        for (let i = 0; i < cols_events; i++) {
+            default_row.push('');
+        }
+        let total_hours = 0;
+        let total_days = 0;
         Object.keys(base).map((key) => {
             const events = base[key];
             if (events.length === 0)
                 return;
             total_days++;
             let hours = 0;
-            const row = [];
-            for (let i = 0; i < cols_events; i++) {
+            const row = [...default_row];
+            for (let i = 0; i < events.length; i++) {
                 const e = events[i];
-                if (!e || !e.start || !e.end) {
-                    row[i] = '';
-                    continue;
-                }
-                const start_au = new Date(e.start.dateTime);
-                const end_au = new Date(e.end.dateTime);
-                const s_h = e.start.dateTime.slice(11, 13);
-                const e_h = e.end.dateTime.slice(11, 13);
-                const s_m = e.start.dateTime.slice(14, 16);
-                const e_m = e.end.dateTime.slice(14, 16);
-                row[i] = `${s_h}:${s_m} - ${e_h}:${e_m}`;
-                hours += (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
-                total_hours +=
-                    (end_au.getTime() - start_au.getTime()) / (60 * 60 * 1000);
+                const timeStart = luxon_1.DateTime.fromISO(e.start.dateTime);
+                const timeEnd = luxon_1.DateTime.fromISO(e.end.dateTime);
+                row[i] = `${timeStart.toFormat('HH:mm')} - ${timeEnd.toFormat('HH:mm')}`;
+                const interval = (timeEnd.toUnixInteger() - timeStart.toUnixInteger()) / 3600;
+                hours += interval;
+                total_hours += interval;
             }
             body.push([pad2z(key), ...row, hours]);
         });
-        const row = [];
-        for (let i = 0; i <= cols_events; i++) {
-            row[i] = 'Tramo ' + (i + 1);
+        const head = ['Dia', 'Horas'];
+        for (let i = 1; i <= cols_events; i++) {
+            head.splice(i, 0, `Tramo ${i}`);
         }
         (0, jspdf_autotable_1.default)(doc, {
-            head: [['Dia', ...row, 'Horas']],
+            head: [head],
             body,
-            startY: doc.lastAutoTable.finalY,
+            startY: doc.lastAutoTable.finalY + 1,
             theme: 'grid',
         });
         (0, jspdf_autotable_1.default)(doc, {
-            head: [],
+            head: [['Resumen', '']],
             body: [
                 ['Total horas: ' + total_hours, 'Total dias: ' + total_days],
                 ['Firma Trabajador\n\n', 'Empresa\n\n'],
             ],
-            startY: doc.lastAutoTable.finalY,
+            startY: doc.lastAutoTable.finalY + 1,
             theme: 'grid',
         });
         return doc.output();

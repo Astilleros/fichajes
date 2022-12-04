@@ -26,7 +26,7 @@ WorkersModule = __decorate([
             user_module_1.UserModule,
             files_module_1.FilesModule,
             checkin_module_1.CheckinModule,
-            sign_module_1.SignModule
+            sign_module_1.SignModule,
         ],
         controllers: [workers_controller_1.WorkersController],
         providers: [workers_service_1.WorkersService, calendar_service_1.CalendarService],

@@ -10,6 +10,6 @@ import { MongooseModule } from '@nestjs/mongoose';
   ],
   controllers: [CheckinController],
   providers: [CheckinService],
-  exports: [CheckinService]
+  exports: [CheckinService],
 })
 export class CheckinModule {}

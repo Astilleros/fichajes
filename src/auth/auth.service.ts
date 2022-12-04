@@ -17,8 +17,8 @@ export class AuthService {
     if (!user) return null;
     const valid = await this.encrip.comparePasswords(pass, user.password);
     if (!valid) return null;
-    const { password, ...result } = user;
-    return result;
+    user.password = '';
+    return user;
   }
 
   async generateAccessToken(user: UserDocument) {

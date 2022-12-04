@@ -25,7 +25,7 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
-import { UserService } from 'src/user/user.service';
+import type { UserService } from 'src/user/user.service';
 import Stripe from 'stripe';
 import { CheckoutsService } from './checkouts/checkouts.service';
 import { CheckoutDocument } from './checkouts/entities/checkout.entity';

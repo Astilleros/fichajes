@@ -63,7 +63,7 @@ export declare class WorkersService {
     changeMode(user_id: string, worker_id: string, new_mode: workerModes): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    generatePdfToSign(userJwt: JwtPayload, worker_id: string, start: string, end: string): Promise<any>;
+    generatePdfToSign(jwt: JwtPayload, worker_id: string, start: string, end: string): Promise<any>;
     getWorkerByCalendar(calendar: string): Promise<Worker & import("mongoose").Document<any, any, any> & {
         _id: import("mongoose").Types.ObjectId;
     }>;

@@ -29,7 +29,6 @@ let CalendarService = class CalendarService {
         return response.data.items;
     }
     async watchCalendarEvents(calendarId) {
-        console.log(calendarId);
         const watchResponse = await this.client.events.watch({
             requestBody: {
                 id: calendarId.replace('@', '-').replace(/\./g, '_'),
@@ -38,7 +37,7 @@ let CalendarService = class CalendarService {
             },
             calendarId,
         });
-        console.log('watchResponse: ', watchResponse.data);
+        return watchResponse;
     }
     async createCalendar(calendarData) {
         const requestBody = Object.assign(Object.assign({}, calendarData), { kind: 'calendar#calendarListEntry' });
