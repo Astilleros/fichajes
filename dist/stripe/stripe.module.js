@@ -16,10 +16,10 @@ let StripeModule = class StripeModule {
 };
 StripeModule = __decorate([
     (0, common_1.Module)({
+        imports: [checkouts_module_1.CheckoutsModule, user_module_1.UserModule],
         controllers: [stripe_controller_1.StripeController],
         providers: [stripe_service_1.StripeService],
         exports: [stripe_service_1.StripeService],
-        imports: [checkouts_module_1.CheckoutsModule, user_module_1.UserModule],
     })
 ], StripeModule);
 exports.StripeModule = StripeModule;

@@ -5,9 +5,9 @@ import { CheckoutsModule } from './checkouts/checkouts.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
+  imports: [CheckoutsModule, UserModule],
   controllers: [StripeController],
   providers: [StripeService],
   exports: [StripeService],
-  imports: [CheckoutsModule, UserModule],
 })
 export class StripeModule {}

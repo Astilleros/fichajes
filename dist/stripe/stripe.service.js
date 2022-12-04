@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StripeService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const user_service_1 = require("../user/user.service");
 const stripe_1 = require("stripe");
 const checkouts_service_1 = require("./checkouts/checkouts.service");
 const status_enum_1 = require("./checkouts/entities/status.enum");
@@ -27,7 +28,6 @@ let StripeService = class StripeService {
         });
     }
     async createCheckout(user) {
-        const activeOld = await this.CheckoutsService.findAll;
         const session = await this.stripe.checkout.sessions.create({
             line_items: [
                 {
@@ -105,7 +105,8 @@ let StripeService = class StripeService {
 StripeService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService,
-        checkouts_service_1.CheckoutsService, Function])
+        checkouts_service_1.CheckoutsService,
+        user_service_1.UserService])
 ], StripeService);
 exports.StripeService = StripeService;
 //# sourceMappingURL=stripe.service.js.map

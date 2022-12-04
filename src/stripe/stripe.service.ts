@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
-import type { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
 import Stripe from 'stripe';
 import { CheckoutsService } from './checkouts/checkouts.service';
 import { CheckoutDocument } from './checkouts/entities/checkout.entity';
@@ -25,8 +25,6 @@ export class StripeService {
   }
 
   async createCheckout(user: JwtPayload) {
-    const activeOld = await this.CheckoutsService.findAll;
-
     const session = await this.stripe.checkout.sessions.create({
       line_items: [
         {
