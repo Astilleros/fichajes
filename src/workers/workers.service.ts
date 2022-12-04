@@ -28,7 +28,7 @@ export class WorkersService {
     private userService: UserService,
     private CheckinService: CheckinService,
     private SignService: SignService,
-  ) {}
+  ) { }
 
   async create(createWorkerDto: Worker): Promise<ListWorkerDto> {
     const createdWorker = new this.workerModel(createWorkerDto);
@@ -171,7 +171,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       _id: worker_id,
       user: user_id,
     });
-    
+
     if (w.mode === new_mode) return w;
     if (new_mode === workerModes.none)
       await this.calendarService.unshareCalendar(w.calendar, w.email);
@@ -281,9 +281,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       body.push([pad2z(key), ...row, hours]);
     });
 
-    const head = ['Dia','Horas'];
+    const head = ['Dia', 'Horas'];
     for (let i = 1; i <= cols_events; i++) {
-      head.splice(i,0, `Tramo ${i}`)
+      head.splice(i, 0, `Tramo ${i}`)
     }
     autoTable(doc, {
       head: [head],
@@ -400,23 +400,39 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         Realiza antes un @checkout para poder hacer @checkin nuevamente.`,
       });
     }
-    // Crear nueva entrada
     const date = new Date().toISOString();
+    // Crea evento
+    const entrada = await this.calendarService.createEvent(worker.calendar, {
+      summary: '',
+      description: '',
+      start: {
+        dateTime: date,
+      },
+      end: {
+        dateTime: date,
+      },
+    });
+
+    // Crear nueva entrada
     const checkin = await this.CheckinService.create({
       worker: worker._id,
       calendar: worker.calendar,
       date,
-      event: e.id,
+      event: entrada.id,
     });
-    if (!checkin)
+    if (!checkin) {
       throw new Error(
         `Imposible crear registro de entrada del trabajador: ${worker.name}`,
       );
+    }
 
-    await this.calendarService.patchEvent(worker.calendar, e.id, {
-      summary: `Checkin abierto a las ${date}`,
-      description: `Recuerda hacer @checkout para registrar la hora de finalización de periodo y registrar la jornada.`,
-    });
+
+    try {
+      await this.calendarService.deleteEvent(worker.calendar, e.id);
+    } catch (e) {
+      console.log('Evento ya eliminado.' + checkin.event);
+    }
+
 
     return checkin;
   }
@@ -433,27 +449,20 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       });
     }
 
-    try {
-      await this.calendarService.deleteEvent(worker.calendar, checkin.event);
-    } catch (e) {
-      console.log('Evento ya eliminado.' + checkin.event);
-    }
+
+    await this.calendarService.patchEvent(worker.calendar, checkin.event, {
+      summary: 'Registro de periodo completado.',
+      end: {
+        dateTime: new Date().toISOString(),
+      },
+    });
+
+
     try {
       await this.calendarService.deleteEvent(worker.calendar, e.id);
     } catch (e) {
       console.log('Evento ya eliminado.' + e.id);
     }
-
-    await this.calendarService.createEvent(worker.calendar, {
-      summary: '',
-      description: '',
-      start: {
-        dateTime: checkin.date,
-      },
-      end: {
-        dateTime: new Date().toISOString(),
-      },
-    });
 
     await this.CheckinService.delete(checkin._id);
   }
