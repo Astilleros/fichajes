@@ -16,7 +16,8 @@ import { FilesService } from 'src/files/files.service';
 import { CheckinService } from 'src/checkin/checkin.service';
 import { SignService } from 'src/sign/sign.service';
 import { workerModes } from './dto/mode.enum';
-import { DateTime, Interval } from 'luxon';
+import { DateTime, Settings } from 'luxon';
+Settings.defaultZone = "Europe/Madrid";
 
 @Injectable()
 export class WorkersService {

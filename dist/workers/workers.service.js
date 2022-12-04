@@ -27,6 +27,7 @@ const checkin_service_1 = require("../checkin/checkin.service");
 const sign_service_1 = require("../sign/sign.service");
 const mode_enum_1 = require("./dto/mode.enum");
 const luxon_1 = require("luxon");
+luxon_1.Settings.defaultZone = "Europe/Madrid";
 let WorkersService = class WorkersService {
     constructor(workerModel, calendarService, FilesService, userService, CheckinService, SignService) {
         this.workerModel = workerModel;
