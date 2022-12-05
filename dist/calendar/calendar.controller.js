@@ -24,14 +24,14 @@ let CalendarController = class CalendarController {
     async watch(req) {
         var _a;
         const status = req.headers['x-goog-resource-state'];
+        console.log('1- WEBHOOK WATCH, status: ', status);
         if (status != 'exists')
             return;
-        console.log('status', status);
         console.log(req.headers['x-goog-channel-id']);
         const calendarId = req.headers['x-goog-channel-id']
             .replace('-', '@')
             .replace(/\_/g, '.');
-        console.log('replaced ', req.headers['x-goog-channel-id']);
+        console.log('2- replaced calendarId: ', calendarId);
         const worker = await this.workersService.getWorkerByCalendar(calendarId);
         if (!worker)
             throw new Error('No encuentra en worker');
@@ -41,19 +41,19 @@ let CalendarController = class CalendarController {
             worker.locked = true;
             await worker.save();
         }
-        console.log('worker', worker);
+        console.log('3- worker & mode: ', worker.name, worker.mode, worker.locked);
         const new_events = await this.CalendarService.getChanges(calendarId, worker.sync);
         let last_updated = 0;
         for (let i = 0; i < new_events.length; i++) {
             const e = new_events[i];
-            console.log(e);
+            console.log('4- evento: ', e.summary, e.start, e.end, Object.keys(e).length);
             const updated = new Date((_a = e.updated) !== null && _a !== void 0 ? _a : e.created).getTime();
             if (last_updated < updated)
                 last_updated = updated;
             await this.workersService.watchEvent(worker, e);
         }
         const sync = new Date(last_updated).toISOString();
-        console.log('new sync', sync);
+        console.log('5- new sync from date: ', sync);
         await this.workersService.update(worker.user, worker._id, {
             sync,
             locked: false,

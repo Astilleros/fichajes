@@ -258,12 +258,14 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
     async watchEvent(worker, e) {
         var _a, _b;
+        console.log(e.status);
         if (e.status === 'cancelled')
             return;
         if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
             e.creator.email != worker.email &&
             e.creator.email != worker.calendar &&
             e.creator.email != worker.private_calendar) {
+            console.log('desechado: personas ajenas al trabajador y calendarios del mismo.');
             return await this.calendarService.deleteEvent(worker.calendar, e.id);
         }
         if ((_b = e.start) === null || _b === void 0 ? void 0 : _b.date) {
@@ -282,6 +284,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         }
     }
     async comandoVincular(worker, e) {
+        console.log('comandoVincular');
         if (worker.status === status_enum_1.workerStatus.pending) {
             await this.update(worker.user, worker._id, {
                 status: status_enum_1.workerStatus.linked,
@@ -297,6 +300,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         }
     }
     async comandoDesvincular(worker, e) {
+        console.log('comandoDesvincular');
         await this.unshareCalendar(worker.user, worker._id);
         await this.calendarService.patchEvent(worker.calendar, e.id, {
             summary: 'Calendario desvinculado',
@@ -323,6 +327,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         });
     }
     async comandoEntrada(worker, e) {
+        console.log('comandoEntrada');
         const needCheckout = await this.CheckinService.findByWorker(worker._id);
         if (needCheckout) {
             return await this.calendarService.patchEvent(worker.calendar, e.id, {
@@ -333,7 +338,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         }
         const date = new Date().toISOString();
         const entrada = await this.calendarService.createEvent(worker.calendar, {
-            summary: '',
+            summary: 'Registrada',
             description: '',
             start: {
                 dateTime: date,
@@ -360,6 +365,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         return checkin;
     }
     async comandoSalida(worker, e) {
+        console.log('comandoSalida');
         const checkin = await this.CheckinService.findByWorker(worker._id);
         if (!checkin) {
             return await this.calendarService.patchEvent(worker.calendar, e.id, {
@@ -385,6 +391,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     }
     async comandoFirmar(worker, e) {
         var _a;
+        console.log('comandoFirmar');
         if (!((_a = e.attachments) === null || _a === void 0 ? void 0 : _a.length)) {
             return await this.calendarService.patchEvent(worker.calendar, e.id, {
                 summary: 'Olvidaste adjuntar el documento.',
