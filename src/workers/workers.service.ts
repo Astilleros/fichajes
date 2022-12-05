@@ -311,6 +311,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
   async watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
     // Desechamos eventos eliminados
+    console.log(e.status );
     if (e.status === 'cancelled') return;
 
     // Desechamos eventos creados por personas ajenas al trabajador y calendarios del mismo.
@@ -320,6 +321,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
     ) {
+      console.log('desechado: personas ajenas al trabajador y calendarios del mismo.');
       return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
 
@@ -335,6 +337,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async comandoVincular(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    console.log('comandoVincular');
+    
     if (worker.status === workerStatus.pending) {
       await this.update(worker.user, worker._id, {
         status: workerStatus.linked,
@@ -354,6 +358,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     worker: WorkerDocument,
     e: calendar_v3.Schema$Event,
   ) {
+    console.log('comandoDesvincular');
     await this.unshareCalendar(worker.user, worker._id);
 
     await this.calendarService.patchEvent(worker.calendar, e.id, {
@@ -391,6 +396,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async comandoEntrada(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    console.log('comandoEntrada');
     // Comprobar no hayan entrado ya.
     const needCheckout = await this.CheckinService.findByWorker(worker._id);
     if (needCheckout) {
@@ -403,7 +409,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     const date = new Date().toISOString();
     // Crea evento
     const entrada = await this.calendarService.createEvent(worker.calendar, {
-      summary: '',
+      summary: 'Registrada',
       description: '',
       start: {
         dateTime: date,
@@ -438,6 +444,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async comandoSalida(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    console.log('comandoSalida');
     // Comprobar que hayan checkin.
     const checkin = await this.CheckinService.findByWorker(worker._id);
     if (!checkin) {
@@ -468,6 +475,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
   }
 
   async comandoFirmar(worker: WorkerDocument, e: calendar_v3.Schema$Event) {
+    console.log('comandoFirmar');
     if (!e.attachments?.length) {
       return await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: 'Olvidaste adjuntar el documento.',
