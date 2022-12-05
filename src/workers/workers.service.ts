@@ -321,7 +321,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
       e.creator.email != worker.calendar &&
       e.creator.email != worker.private_calendar
     ) {
-      console.log('desechado: personas ajenas al trabajador y calendarios del mismo.', JSON.stringify(e.creator, null, 2));
+      console.log('desechado: personas ajenas al trabajador y calendarios del mismo.', JSON.stringify(e, null, 2));
       return await this.calendarService.deleteEvent(worker.calendar, e.id);
     }
 
