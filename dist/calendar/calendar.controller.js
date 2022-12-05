@@ -27,7 +27,6 @@ let CalendarController = class CalendarController {
         console.log('1- WEBHOOK WATCH, status: ', status);
         if (status != 'exists')
             return;
-        console.log(req.headers['x-goog-channel-id']);
         const calendarId = req.headers['x-goog-channel-id']
             .replace('-', '@')
             .replace(/\_/g, '.');
@@ -52,6 +51,8 @@ let CalendarController = class CalendarController {
                 last_updated = updated;
             await this.workersService.watchEvent(worker, e);
         }
+        if (!last_updated)
+            last_updated = new Date(worker.sync).getTime();
         const sync = new Date(last_updated).toISOString();
         console.log('5- new sync from date: ', sync);
         await this.workersService.update(worker.user, worker._id, {
