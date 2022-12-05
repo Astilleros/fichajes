@@ -229,7 +229,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
                 hours += interval;
                 total_hours += interval;
             }
-            body.push([pad2z(key), ...row, hours]);
+            body.push([pad2z(key), ...row, hours.toFixed(2)]);
         });
         const head = ['Dia', 'Horas'];
         for (let i = 1; i <= cols_events; i++) {
@@ -244,7 +244,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         (0, jspdf_autotable_1.default)(doc, {
             head: [['Resumen', '']],
             body: [
-                ['Total horas: ' + total_hours, 'Total dias: ' + total_days],
+                ['Total horas: ' + total_hours.toFixed(2), 'Total dias: ' + total_days],
                 ['Firma Trabajador\n\n', 'Empresa\n\n'],
             ],
             startY: doc.lastAutoTable.finalY + 1,
