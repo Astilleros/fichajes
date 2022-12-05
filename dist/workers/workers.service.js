@@ -261,7 +261,8 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
         console.log(e.status);
         if (e.status === 'cancelled')
             return;
-        if (((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
+        if (!e.organizer.self &&
+            ((_a = e.creator) === null || _a === void 0 ? void 0 : _a.email.length) &&
             e.creator.email != worker.email &&
             e.creator.email != worker.calendar &&
             e.creator.email != worker.private_calendar) {

@@ -316,6 +316,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
     // Desechamos eventos creados por personas ajenas al trabajador y calendarios del mismo.
     if (
+      !e.organizer.self &&
       e.creator?.email.length &&
       e.creator.email != worker.email &&
       e.creator.email != worker.calendar &&
