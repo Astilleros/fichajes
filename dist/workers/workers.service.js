@@ -37,8 +37,8 @@ let WorkersService = class WorkersService {
         this.CheckinService = CheckinService;
         this.SignService = SignService;
     }
-    async create(createWorkerDto) {
-        const createdWorker = new this.workerModel(createWorkerDto);
+    async create(user, createWorkerDto) {
+        const createdWorker = new this.workerModel(Object.assign({ user: user._id, mode: mode_enum_1.workerModes.none }, createWorkerDto));
         const calendar = await this.calendarService.createCalendar({
             summary: `FicFac: ${createdWorker.name}`,
             description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
@@ -75,13 +75,18 @@ let WorkersService = class WorkersService {
     }
     async update(user_id, _id, updateWorkerDto) {
         const worker = await this.workerModel.findById(_id);
+        let mode = worker.mode;
         if (updateWorkerDto.mode !== worker.mode) {
             const editMode = await this.changeMode(user_id, worker._id, updateWorkerDto.mode);
-            updateWorkerDto.mode = editMode.mode;
+            mode = editMode.mode;
         }
         return this.workerModel
-            .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
+            .findOneAndUpdate({ _id, user: user_id }, Object.assign(Object.assign({}, updateWorkerDto), { mode }), { new: true })
             .exec();
+    }
+    async _setInternal(_id, internal) {
+        const worker = await this.workerModel.findByIdAndUpdate(_id, internal, { new: true });
+        return worker;
     }
     async remove(user_id, _id) {
         const worker = await this.workerModel
@@ -287,9 +292,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     async comandoVincular(worker, e) {
         console.log('comandoVincular');
         if (worker.status === status_enum_1.workerStatus.pending) {
-            await this.update(worker.user, worker._id, {
-                status: status_enum_1.workerStatus.linked,
-            });
+            await this._setInternal(worker._id, { status: status_enum_1.workerStatus.linked });
             await this.calendarService.patchEvent(worker.calendar, e.id, {
                 summary: 'Vinculado corectamente',
             });

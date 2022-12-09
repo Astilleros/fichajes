@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { calendar_v3 } from 'googleapis';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { CalendarService } from 'src/calendar/calendar.service';
 import { ListWorkerDto } from './dto/list-worker.dto';
@@ -17,6 +17,7 @@ import { CheckinService } from 'src/checkin/checkin.service';
 import { SignService } from 'src/sign/sign.service';
 import { workerModes } from './dto/mode.enum';
 import { DateTime, Settings } from 'luxon';
+import { CreateWorkerDto } from './dto/create-worker.dto';
 Settings.defaultZone = "Europe/Madrid";
 
 @Injectable()
@@ -30,8 +31,8 @@ export class WorkersService {
     private SignService: SignService,
   ) { }
 
-  async create(createWorkerDto: Worker): Promise<ListWorkerDto> {
-    const createdWorker = new this.workerModel(createWorkerDto);
+  async create(user: JwtPayload,  createWorkerDto: CreateWorkerDto): Promise<ListWorkerDto> {
+    const createdWorker = new this.workerModel({user: user._id, mode: workerModes.none, ...createWorkerDto});
 
     const calendar = await this.calendarService.createCalendar({
       summary: `FicFac: ${createdWorker.name}`,
@@ -58,7 +59,7 @@ export class WorkersService {
   }
   async filterEvents(
     user: JwtPayload,
-    worker_id: string,
+    worker_id: Types.ObjectId,
     start: string,
     end: string,
   ): Promise<calendar_v3.Schema$Event[]> {
@@ -76,13 +77,14 @@ export class WorkersService {
     return events;
   }
 
-  findOne(user_id: string, _id: string) {
+  findOne(user_id: Types.ObjectId, _id: Types.ObjectId) {
     const worker = this.workerModel.findOne({ _id, user: user_id }).exec();
     return worker;
   }
 
-  async update(user_id: string, _id: string, updateWorkerDto: UpdateWorkerDto) {
+  async update(user_id: Types.ObjectId, _id: Types.ObjectId, updateWorkerDto: UpdateWorkerDto) {
     const worker = await this.workerModel.findById(_id);
+    let mode = worker.mode
 
     if (updateWorkerDto.mode !== worker.mode) {
       const editMode = await this.changeMode(
@@ -90,15 +92,20 @@ export class WorkersService {
         worker._id,
         updateWorkerDto.mode,
       );
-      updateWorkerDto.mode = editMode.mode;
+      mode = editMode.mode;
     }
 
     return this.workerModel
-      .findOneAndUpdate({ _id, user: user_id }, updateWorkerDto, { new: true })
+      .findOneAndUpdate({ _id, user: user_id }, {...updateWorkerDto, mode}, { new: true })
       .exec();
   }
 
-  async remove(user_id: string, _id: string) {
+  async _setInternal(_id: Types.ObjectId, internal : { locked?: boolean, status?: workerStatus, sync?: string }): Promise<Worker>{
+    const worker = await this.workerModel.findByIdAndUpdate(_id, internal, {new: true});
+    return worker;
+  }
+
+  async remove(user_id: Types.ObjectId, _id: Types.ObjectId) {
     const worker = await this.workerModel
       .findOneAndDelete({ _id, user: user_id })
       .exec();
@@ -114,7 +121,7 @@ export class WorkersService {
     return worker;
   }
 
-  async shareCalendar(user_id: string, worker_id: string) {
+  async shareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId) {
     const worker = await this.workerModel.findOne({
       _id: worker_id,
       user: user_id,
@@ -147,7 +154,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     return updated;
   }
 
-  async unshareCalendar(user_id: string, worker_id: string) {
+  async unshareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId) {
     const worker = await this.workerModel.findOne({
       _id: worker_id,
       user: user_id,
@@ -166,7 +173,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     return updated;
   }
 
-  async changeMode(user_id: string, worker_id: string, new_mode: workerModes) {
+  async changeMode(user_id: Types.ObjectId, worker_id: Types.ObjectId, new_mode: workerModes) {
     const w = await this.workerModel.findOne({
       _id: worker_id,
       user: user_id,
@@ -192,7 +199,7 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
 
   async generatePdfToSign(
     jwt: JwtPayload,
-    worker_id: string,
+    worker_id: Types.ObjectId,
     start: string,
     end: string,
   ) {
@@ -341,9 +348,9 @@ En la web "www.ficharfacil.com" encontraras una sección con manuales, videos y 
     console.log('comandoVincular');
     
     if (worker.status === workerStatus.pending) {
-      await this.update(worker.user, worker._id, {
-        status: workerStatus.linked,
-      });
+
+      await this._setInternal(worker._id, {status: workerStatus.linked})
+
       await this.calendarService.patchEvent(worker.calendar, e.id, {
         summary: 'Vinculado corectamente',
       });

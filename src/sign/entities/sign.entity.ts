@@ -1,15 +1,15 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 
-export type SignDocument = Sign & Document;
+export type SignDocument = HydratedDocument<Sign>;
 
 @Schema({ versionKey: false })
 export class Sign {
-  @Prop()
-  readonly user: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  readonly user: Types.ObjectId;
 
-  @Prop()
-  readonly worker: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Worker', required: true })
+  readonly worker: Types.ObjectId;
 
   @Prop()
   readonly file: string;
@@ -18,7 +18,7 @@ export class Sign {
   readonly month: string;
 
   @Prop()
-  readonly createdAt: string;
+  readonly createdAt: Date;
 }
 
 export const SignSchema = SchemaFactory.createForClass(Sign);

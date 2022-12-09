@@ -20,6 +20,7 @@ const update_task_dto_1 = require("./dto/update-task.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const AuthUser_decorator_1 = require("../auth/decorators/AuthUser.decorator");
 const jwtPayload_dto_1 = require("../auth/dto/jwtPayload.dto");
+const mongoose_1 = require("mongoose");
 let TasksController = class TasksController {
     constructor(tasksService) {
         this.tasksService = tasksService;
@@ -30,20 +31,20 @@ let TasksController = class TasksController {
     findAll(user) {
         return this.tasksService.findAll(user._id);
     }
-    findOne(user, id) {
-        return this.tasksService.findOne(user._id, id);
+    findOne(user, _id) {
+        return this.tasksService.findOne(user._id, _id);
     }
-    update(user, id, updateTaskDto) {
-        return this.tasksService.update(user._id, id, updateTaskDto);
+    update(user, _id, updateTaskDto) {
+        return this.tasksService.update(user._id, _id, updateTaskDto);
     }
-    remove(user, id) {
-        return this.tasksService.remove(user._id, id);
+    remove(user, _id) {
+        return this.tasksService.remove(user._id, _id);
     }
-    addWorker(user, id, worker_id) {
-        return this.tasksService.addWorker(user._id, id, worker_id);
+    addWorker(user, _id, worker_id) {
+        return this.tasksService.addWorker(user._id, _id, worker_id);
     }
-    deleteWorker(user, id, worker_id) {
-        return this.tasksService.deleteWorker(user._id, id, worker_id);
+    deleteWorker(user, _id, worker_id) {
+        return this.tasksService.deleteWorker(user._id, _id, worker_id);
     }
 };
 __decorate([
@@ -62,46 +63,46 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, update_task_dto_1.UpdateTaskDto]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, update_task_dto_1.UpdateTaskDto]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Post)('/:id/worker/:worker_id'),
+    (0, common_1.Post)('/:_id/worker/:worker_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __param(2, (0, common_1.Param)('worker_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "addWorker", null);
 __decorate([
-    (0, common_1.Delete)('/:id/worker/:worker_id'),
+    (0, common_1.Delete)('/:_id/worker/:worker_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __param(2, (0, common_1.Param)('worker_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "deleteWorker", null);
 TasksController = __decorate([

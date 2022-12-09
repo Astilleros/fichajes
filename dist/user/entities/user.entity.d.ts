@@ -22,8 +22,8 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Document } from 'mongoose';
-export type UserDocument = User & Document;
+import { HydratedDocument } from 'mongoose';
+export type UserDocument = HydratedDocument<User>;
 export declare class User {
     readonly username: string;
     password: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateCheckinDto } from './dto/create-checkin.dto';
 import { Checkin, CheckinDocument } from './entities/checkin.entity';
 
@@ -16,12 +16,12 @@ export class CheckinService {
     return checkin;
   }
 
-  async findByWorker(worker: string): Promise<CheckinDocument> {
+  async findByWorker(worker: Types.ObjectId): Promise<CheckinDocument> {
     const checkin = await this.CheckinModel.findOne({ worker }).exec();
     return checkin;
   }
 
-  async delete(_id: string): Promise<void> {
+  async delete(_id: Types.ObjectId): Promise<void> {
     await this.CheckinModel.deleteOne({ _id }).exec();
   }
 }

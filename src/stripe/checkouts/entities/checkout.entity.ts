@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import Stripe from 'stripe';
 import { CheckoutStatus } from './status.enum';
 
-export type CheckoutDocument = Checkout & Document;
+export type CheckoutDocument = HydratedDocument<Checkout>;
 
 @Schema({
   timestamps: true,
@@ -10,7 +11,7 @@ export type CheckoutDocument = Checkout & Document;
 })
 export class Checkout {
   @Prop()
-  readonly user: string;
+  readonly user: Types.ObjectId;
 
   @Prop({ default: new Date() })
   readonly createdAt: Date;

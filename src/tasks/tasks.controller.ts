@@ -14,6 +14,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthUser } from 'src/auth/decorators/AuthUser.decorator';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import { Types } from 'mongoose';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -30,41 +31,41 @@ export class TasksController {
     return this.tasksService.findAll(user._id);
   }
 
-  @Get(':id')
-  findOne(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.tasksService.findOne(user._id, id);
+  @Get(':_id')
+  findOne(@AuthUser() user: JwtPayload, @Param('_id') _id: Types.ObjectId) {
+    return this.tasksService.findOne(user._id, _id);
   }
 
-  @Patch(':id')
+  @Patch(':_id')
   update(
     @AuthUser() user: JwtPayload,
-    @Param('id') id: string,
+    @Param('_id') _id: Types.ObjectId,
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
-    return this.tasksService.update(user._id, id, updateTaskDto);
+    return this.tasksService.update(user._id, _id, updateTaskDto);
   }
 
-  @Delete(':id')
-  remove(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.tasksService.remove(user._id, id);
+  @Delete(':_id')
+  remove(@AuthUser() user: JwtPayload, @Param('_id') _id: Types.ObjectId) {
+    return this.tasksService.remove(user._id, _id);
   }
 
   /////// EDIT WORKERS RELATED
 
-  @Post('/:id/worker/:worker_id')
+  @Post('/:_id/worker/:worker_id')
   addWorker(
     @AuthUser() user: JwtPayload,
-    @Param('id') id: string,
-    @Param('worker_id') worker_id: string,
+    @Param('_id') _id: Types.ObjectId,
+    @Param('worker_id') worker_id: Types.ObjectId,
   ) {
-    return this.tasksService.addWorker(user._id, id, worker_id);
+    return this.tasksService.addWorker(user._id, _id, worker_id);
   }
-  @Delete('/:id/worker/:worker_id')
+  @Delete('/:_id/worker/:worker_id')
   deleteWorker(
     @AuthUser() user: JwtPayload,
-    @Param('id') id: string,
-    @Param('worker_id') worker_id: string,
+    @Param('_id') _id: Types.ObjectId,
+    @Param('worker_id') worker_id: Types.ObjectId,
   ) {
-    return this.tasksService.deleteWorker(user._id, id, worker_id);
+    return this.tasksService.deleteWorker(user._id, _id, worker_id);
   }
 }

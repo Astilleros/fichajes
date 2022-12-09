@@ -21,15 +21,17 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
-/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
 import { SignService } from './sign.service';
 import { CreateSignDto } from './dto/create-sign.dto';
+import { Types } from 'mongoose';
 export declare class SignController {
     private readonly signService;
     constructor(signService: SignService);
     create(createSignDto: CreateSignDto): Promise<import("./entities/sign.entity").Sign>;
-    findById(id: string): Promise<import("./entities/sign.entity").Sign & import("mongoose").Document<any, any, any> & {
-        _id: import("mongoose").Types.ObjectId;
-    }>;
+    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/sign.entity").Sign> & import("./entities/sign.entity").Sign & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>>;
 }

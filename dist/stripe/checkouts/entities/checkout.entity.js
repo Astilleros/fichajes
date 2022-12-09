@@ -11,13 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckoutSchema = exports.Checkout = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const stripe_1 = require("stripe");
 const status_enum_1 = require("./status.enum");
 let Checkout = class Checkout {
 };
 __decorate([
     (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
+    __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Checkout.prototype, "user", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: new Date() }),

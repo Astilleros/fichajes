@@ -22,8 +22,8 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Document } from 'mongoose';
-export type CheckinDocument = Checkin & Document;
+import { HydratedDocument } from 'mongoose';
+export type CheckinDocument = HydratedDocument<Checkin>;
 export declare class Checkin {
     readonly worker: string;
     readonly calendar: string;

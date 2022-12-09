@@ -2,6 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { Response } from 'express';
 import { CalendarService } from 'src/calendar/calendar.service';
+import { Types } from 'mongoose';
 
 @Controller('files')
 export class FilesController {
@@ -10,9 +11,9 @@ export class FilesController {
     private readonly calendarService: CalendarService,
   ) {}
 
-  @Get(':id')
-  async findOne(@Res() res: Response, @Param('id') id: string) {
-    const file = await this.filesService.findById(id);
+  @Get(':_id')
+  async findOne(@Res() res: Response, @Param('_id') _id: Types.ObjectId) {
+    const file = await this.filesService.findById(_id);
     if (!file) return;
     await this.calendarService.deleteEvent(file.calendar, file.event);
     res.set({

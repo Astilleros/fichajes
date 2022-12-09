@@ -22,24 +22,32 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { UpdateCheckoutDto } from './dto/update-checkout.dto';
 import { Checkout, CheckoutDocument } from './entities/checkout.entity';
 export declare class CheckoutsService {
     private readonly CheckoutModel;
     constructor(CheckoutModel: Model<CheckoutDocument>);
-    create(createCheckoutDto: CreateCheckoutDto): Promise<import("mongoose").Document<unknown, any, CheckoutDocument> & Checkout & Document & {
-        _id: import("mongoose").Types.ObjectId;
-    }>;
-    findOne(session_id: string): Promise<import("mongoose").Document<unknown, any, CheckoutDocument> & Checkout & Document & {
-        _id: import("mongoose").Types.ObjectId;
-    }>;
-    findAll(user_id: string): Promise<(import("mongoose").Document<unknown, any, CheckoutDocument> & Checkout & Document & {
-        _id: import("mongoose").Types.ObjectId;
-    })[]>;
-    update(_id: string, updateCheckoutDto: UpdateCheckoutDto): Promise<import("mongoose").Document<unknown, any, CheckoutDocument> & Checkout & Document & {
-        _id: import("mongoose").Types.ObjectId;
-    }>;
-    remove(_id: string): Promise<import("mongodb").DeleteResult>;
+    create(createCheckoutDto: CreateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>>;
+    findOne(session_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>>;
+    findAll(user_id: Types.ObjectId): Promise<(import("mongoose").Document<unknown, any, Checkout> & Checkout & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>)[]>;
+    update(_id: Types.ObjectId, updateCheckoutDto: UpdateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>>;
+    remove(_id: Types.ObjectId): Promise<import("mongodb").DeleteResult>;
 }

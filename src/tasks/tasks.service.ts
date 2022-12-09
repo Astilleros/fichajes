@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { CalendarService } from 'src/calendar/calendar.service';
 import { WorkersService } from 'src/workers/workers.service';
@@ -42,25 +42,33 @@ export class TasksService {
     return createdTask.save();
   }
 
-  findAll(user_id: string): Promise<TaskDocument[]> {
+  findAll(user_id: Types.ObjectId): Promise<TaskDocument[]> {
     return this.taskModel.find({ user: user_id }).exec();
   }
 
-  findOne(user_id: string, _id: string) {
+  findOne(user_id: Types.ObjectId, _id: Types.ObjectId) {
     return this.taskModel.findOne({ _id, user: user_id }).exec();
   }
 
-  update(user_id: string, _id: string, updateTaskDto: UpdateTaskDto) {
+  update(
+    user_id: Types.ObjectId,
+    _id: Types.ObjectId,
+    updateTaskDto: UpdateTaskDto,
+  ) {
     return this.taskModel
       .findOneAndUpdate({ _id, user: user_id }, updateTaskDto, { new: true })
       .exec();
   }
 
-  remove(user_id: string, _id: string) {
+  remove(user_id: Types.ObjectId, _id: Types.ObjectId) {
     return this.taskModel.findOneAndDelete({ _id, user: user_id }).exec();
   }
 
-  async addWorker(user_id: string, _id: string, worker_id: string) {
+  async addWorker(
+    user_id: Types.ObjectId,
+    _id: Types.ObjectId,
+    worker_id: Types.ObjectId,
+  ) {
     const validWorker = await this.workerService.findOne(user_id, worker_id);
     if (!validWorker?.email)
       throw new Error('Intentando añadir trabajador no vinculado.');
@@ -80,7 +88,11 @@ export class TasksService {
     return taskUpdated;
   }
 
-  async deleteWorker(user_id: string, task_id: string, worker_id: string) {
+  async deleteWorker(
+    user_id: Types.ObjectId,
+    task_id: Types.ObjectId,
+    worker_id: Types.ObjectId,
+  ) {
     const validWorker = await this.workerService.findOne(user_id, worker_id);
     if (!validWorker)
       throw new Error('Intentando eliminar trabajador no vinculado.');

@@ -1,5 +1,7 @@
+import { Types } from 'mongoose';
+
 export class CreateCheckoutDto {
-  user: string;
+  user: Types.ObjectId;
 
   checkout: any;
 

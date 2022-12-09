@@ -29,11 +29,15 @@ import { StripeService } from './stripe.service';
 export declare class StripeController {
     private readonly stripeService;
     constructor(stripeService: StripeService);
-    list(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    list(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
         _id: import("mongoose").Types.ObjectId;
-    })[]>;
-    create(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    } & Required<{
         _id: import("mongoose").Types.ObjectId;
-    }>;
+    }>)[]>;
+    create(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
+        _id: import("mongoose").Types.ObjectId;
+    } & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }>>;
     webhook(req: RawBodyRequest<Request>): Promise<void>;
 }

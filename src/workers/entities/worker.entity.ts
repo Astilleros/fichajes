@@ -1,33 +1,33 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { workerModes } from '../dto/mode.enum';
 import { workerStatus } from '../dto/status.enum';
 
-export type WorkerDocument = Worker & Document;
+export type WorkerDocument = HydratedDocument<Worker>;
 
 @Schema({ versionKey: false })
 export class Worker {
-  @Prop()
-  readonly user: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
 
   @Prop({
     required: true,
   })
-  readonly name: string;
+  name: string;
 
   @Prop()
-  readonly dni: string;
+  dni: string;
 
   @Prop()
-  readonly seguridad_social: string;
+  seguridad_social: string;
 
   @Prop({
     required: true,
   })
-  readonly email: string;
+  email: string;
 
   @Prop()
-  readonly mobile: string;
+  mobile: string;
 
   @Prop({ default: '' })
   calendar?: string;
@@ -38,8 +38,8 @@ export class Worker {
   @Prop({ default: workerStatus.unlinked })
   status?: workerStatus;
 
-  @Prop({ default: new Date().toISOString() })
-  sync: string;
+  @Prop({ default: new Date() })
+  sync: Date;
 
   @Prop({ enum: workerModes, default: workerModes.none })
   mode: workerModes;

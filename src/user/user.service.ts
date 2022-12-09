@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { EncriptService } from 'src/encript/encript.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,23 +19,20 @@ export class UserService {
     return await this.userModel.create(user);
   }
 
-  async findOne(id: string): Promise<UserDocument> {
+  async findOne(id: Types.ObjectId): Promise<UserDocument> {
     return await this.userModel.findOne({ _id: id });
   }
 
   async update(
-    id: string,
+    id: Types.ObjectId,
     updateUserDto: UpdateUserDto,
   ): Promise<UserDocument> {
-    const update = { ...updateUserDto };
-    if (update.password)
-      update.password = await this.encript.hashUserPassword(update.password);
     return await this.userModel
-      .findOneAndUpdate({ _id: id }, update, { new: true })
+      .findOneAndUpdate({ _id: id }, updateUserDto, { new: true })
       .lean();
   }
 
-  async remove(id: string): Promise<UserDocument> {
+  async remove(id: Types.ObjectId): Promise<UserDocument> {
     return await this.userModel.findOneAndDelete({ _id: id }).lean();
   }
 

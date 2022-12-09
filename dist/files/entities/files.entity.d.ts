@@ -22,8 +22,8 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Document } from 'mongoose';
-export type FilesDocument = Files & Document;
+import { HydratedDocument } from 'mongoose';
+export type FilesDocument = HydratedDocument<Files>;
 export declare class Files {
     readonly filename: string;
     readonly data: string;

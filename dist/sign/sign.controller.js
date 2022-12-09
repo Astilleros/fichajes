@@ -16,6 +16,7 @@ exports.SignController = void 0;
 const common_1 = require("@nestjs/common");
 const sign_service_1 = require("./sign.service");
 const create_sign_dto_1 = require("./dto/create-sign.dto");
+const mongoose_1 = require("mongoose");
 let SignController = class SignController {
     constructor(signService) {
         this.signService = signService;
@@ -23,8 +24,8 @@ let SignController = class SignController {
     create(createSignDto) {
         return this.signService.create(createSignDto);
     }
-    findById(id) {
-        return this.signService.findById(id);
+    findById(_id) {
+        return this.signService.findById(_id);
     }
 };
 __decorate([
@@ -35,10 +36,10 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SignController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(':_id'),
+    __param(0, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], SignController.prototype, "findById", null);
 SignController = __decorate([

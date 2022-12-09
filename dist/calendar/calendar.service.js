@@ -125,7 +125,7 @@ let CalendarService = class CalendarService {
     async getChanges(calendarId, updatedMin) {
         const options = {
             calendarId,
-            updatedMin,
+            updatedMin: updatedMin.toISOString(),
             singleEvents: false,
             showDeleted: false,
             showHiddenInvitations: false,

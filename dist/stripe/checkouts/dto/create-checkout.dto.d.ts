@@ -1,5 +1,6 @@
+import { Types } from 'mongoose';
 export declare class CreateCheckoutDto {
-    user: string;
+    user: Types.ObjectId;
     checkout: any;
     createdAt?: Date;
     confirmedAt?: Date;

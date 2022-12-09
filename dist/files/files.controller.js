@@ -16,13 +16,14 @@ exports.FilesController = void 0;
 const common_1 = require("@nestjs/common");
 const files_service_1 = require("./files.service");
 const calendar_service_1 = require("../calendar/calendar.service");
+const mongoose_1 = require("mongoose");
 let FilesController = class FilesController {
     constructor(filesService, calendarService) {
         this.filesService = filesService;
         this.calendarService = calendarService;
     }
-    async findOne(res, id) {
-        const file = await this.filesService.findById(id);
+    async findOne(res, _id) {
+        const file = await this.filesService.findById(_id);
         if (!file)
             return;
         await this.calendarService.deleteEvent(file.calendar, file.event);
@@ -34,11 +35,11 @@ let FilesController = class FilesController {
     }
 };
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(':_id'),
     __param(0, (0, common_1.Res)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", Promise)
 ], FilesController.prototype, "findOne", null);
 FilesController = __decorate([

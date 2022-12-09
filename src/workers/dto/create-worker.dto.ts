@@ -1,14 +1,23 @@
-import { workerModes } from './mode.enum';
-import { workerStatus } from './status.enum';
+import { IsEmail, IsString, Length } from 'class-validator';
 
 export class CreateWorkerDto {
-  name: string;
-  dni: string;
-  email: string;
-  seguridad_social: string;
-  mobile: string;
-  status: workerStatus;
-  sync: string;
-  mode: workerModes;
-  locked?: boolean;
+  @IsString()
+  @Length(8, 50)
+  readonly name: string;
+
+  @IsString()
+  @Length(8, 11)
+  readonly dni: string;
+
+  @IsString()
+  @IsEmail()
+  readonly email: string;
+
+  @IsString()
+  @Length(8, 11)
+  readonly seguridad_social: string;
+
+  @IsString()
+  @Length(8, 11)
+  readonly mobile: string;
 }

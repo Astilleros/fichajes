@@ -22,7 +22,7 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { CalendarService } from 'src/calendar/calendar.service';
 import { WorkersService } from 'src/workers/workers.service';
@@ -35,20 +35,20 @@ export declare class TasksService {
     private calendarService;
     constructor(taskModel: Model<TaskDocument>, workerService: WorkersService, calendarService: CalendarService);
     create(user: JwtPayload, createTaskDto: CreateTaskDto): Promise<TaskDocument>;
-    findAll(user_id: string): Promise<TaskDocument[]>;
-    findOne(user_id: string, _id: string): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    findAll(user_id: Types.ObjectId): Promise<TaskDocument[]>;
+    findOne(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    update(user_id: string, _id: string, updateTaskDto: UpdateTaskDto): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    update(user_id: Types.ObjectId, _id: Types.ObjectId, updateTaskDto: UpdateTaskDto): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    remove(user_id: string, _id: string): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    remove(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    addWorker(user_id: string, _id: string, worker_id: string): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    addWorker(user_id: Types.ObjectId, _id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    deleteWorker(user_id: string, task_id: string, worker_id: string): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    deleteWorker(user_id: Types.ObjectId, task_id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, TaskDocument> & Task & Document & {
+        _id: Types.ObjectId;
     }>;
 }

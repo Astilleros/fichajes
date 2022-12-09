@@ -18,6 +18,7 @@ import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { AuthUser } from 'src/auth/decorators/AuthUser.decorator';
+import { Types } from 'mongoose';
 
 @Controller('workers')
 @UseGuards(JwtAuthGuard)
@@ -29,10 +30,7 @@ export class WorkersController {
     @AuthUser() user: JwtPayload,
     @Body() createWorkerDto: CreateWorkerDto,
   ) {
-    return this.workersService.create({
-      ...createWorkerDto,
-      user: user._id,
-    });
+    return this.workersService.create(user, createWorkerDto);
   }
 
   @Get()
@@ -43,40 +41,46 @@ export class WorkersController {
   @Get('events')
   filterEvents(
     @AuthUser() user: JwtPayload,
-    @Query('worker_id') worker_id: string,
+    @Query('worker_id') worker_id: Types.ObjectId,
     @Query('start') start: string,
     @Query('end') end: string,
   ) {
     return this.workersService.filterEvents(user, worker_id, start, end);
   }
 
-  @Get(':id')
-  findOne(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.workersService.findOne(user._id, id);
+  @Get(':_id')
+  findOne(@AuthUser() user: JwtPayload, @Param('_id') _id: Types.ObjectId) {
+    return this.workersService.findOne(user._id, _id);
   }
 
-  @Patch(':id')
+  @Patch(':_id')
   update(
     @AuthUser() user: JwtPayload,
-    @Param('id') id: string,
+    @Param('_id') _id: Types.ObjectId,
     @Body() updateWorkerDto: UpdateWorkerDto,
   ) {
-    return this.workersService.update(user._id, id, updateWorkerDto);
+    return this.workersService.update(user._id, _id, updateWorkerDto);
   }
 
-  @Delete(':id')
-  remove(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.workersService.remove(user._id, id);
+  @Delete(':_id')
+  remove(@AuthUser() user: JwtPayload, @Param('_id') _id: Types.ObjectId) {
+    return this.workersService.remove(user._id, _id);
   }
 
-  @Get('/share/:id')
-  shareCalendar(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.workersService.shareCalendar(user._id, id);
+  @Get('/share/:_id')
+  shareCalendar(
+    @AuthUser() user: JwtPayload,
+    @Param('id') _id: Types.ObjectId,
+  ) {
+    return this.workersService.shareCalendar(user._id, _id);
   }
 
-  @Get('/unshare/:id')
-  unshareCalendar(@AuthUser() user: JwtPayload, @Param('id') id: string) {
-    return this.workersService.unshareCalendar(user._id, id);
+  @Get('/unshare/:_id')
+  unshareCalendar(
+    @AuthUser() user: JwtPayload,
+    @Param('_id') _id: Types.ObjectId,
+  ) {
+    return this.workersService.unshareCalendar(user._id, _id);
   }
 
   @Get('/generate/pdf')
@@ -84,7 +88,7 @@ export class WorkersController {
   @Header('Content-Disposition', 'attachment; filename="package.pdf"')
   generatePdf(
     @AuthUser() user: JwtPayload,
-    @Query('worker_id') worker_id: string,
+    @Query('worker_id') worker_id: Types.ObjectId,
     @Query('start') start: string,
     @Query('end') end: string,
   ) {

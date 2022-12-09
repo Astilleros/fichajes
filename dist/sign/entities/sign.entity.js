@@ -11,15 +11,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignSchema = exports.Sign = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 let Sign = class Sign {
 };
 __decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User', required: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Sign.prototype, "user", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Worker', required: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Sign.prototype, "worker", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
@@ -31,7 +32,7 @@ __decorate([
 ], Sign.prototype, "month", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Date)
 ], Sign.prototype, "createdAt", void 0);
 Sign = __decorate([
     (0, mongoose_1.Schema)({ versionKey: false })

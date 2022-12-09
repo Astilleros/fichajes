@@ -20,12 +20,13 @@ const update_worker_dto_1 = require("./dto/update-worker.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const jwtPayload_dto_1 = require("../auth/dto/jwtPayload.dto");
 const AuthUser_decorator_1 = require("../auth/decorators/AuthUser.decorator");
+const mongoose_1 = require("mongoose");
 let WorkersController = class WorkersController {
     constructor(workersService) {
         this.workersService = workersService;
     }
     create(user, createWorkerDto) {
-        return this.workersService.create(Object.assign(Object.assign({}, createWorkerDto), { user: user._id }));
+        return this.workersService.create(user, createWorkerDto);
     }
     findAll(user) {
         return this.workersService.findAll(user);
@@ -33,20 +34,20 @@ let WorkersController = class WorkersController {
     filterEvents(user, worker_id, start, end) {
         return this.workersService.filterEvents(user, worker_id, start, end);
     }
-    findOne(user, id) {
-        return this.workersService.findOne(user._id, id);
+    findOne(user, _id) {
+        return this.workersService.findOne(user._id, _id);
     }
-    update(user, id, updateWorkerDto) {
-        return this.workersService.update(user._id, id, updateWorkerDto);
+    update(user, _id, updateWorkerDto) {
+        return this.workersService.update(user._id, _id, updateWorkerDto);
     }
-    remove(user, id) {
-        return this.workersService.remove(user._id, id);
+    remove(user, _id) {
+        return this.workersService.remove(user._id, _id);
     }
-    shareCalendar(user, id) {
-        return this.workersService.shareCalendar(user._id, id);
+    shareCalendar(user, _id) {
+        return this.workersService.shareCalendar(user._id, _id);
     }
-    unshareCalendar(user, id) {
-        return this.workersService.unshareCalendar(user._id, id);
+    unshareCalendar(user, _id) {
+        return this.workersService.unshareCalendar(user._id, _id);
     }
     generatePdf(user, worker_id, start, end) {
         return this.workersService.generatePdfToSign(user, worker_id, start, end);
@@ -75,48 +76,48 @@ __decorate([
     __param(2, (0, common_1.Query)('start')),
     __param(3, (0, common_1.Query)('end')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, String, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, String, String]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "filterEvents", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, update_worker_dto_1.UpdateWorkerDto]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, update_worker_dto_1.UpdateWorkerDto]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(':_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Get)('/share/:id'),
+    (0, common_1.Get)('/share/:_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "shareCalendar", null);
 __decorate([
-    (0, common_1.Get)('/unshare/:id'),
+    (0, common_1.Get)('/unshare/:_id'),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "unshareCalendar", null);
 __decorate([
@@ -128,7 +129,7 @@ __decorate([
     __param(2, (0, common_1.Query)('start')),
     __param(3, (0, common_1.Query)('end')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, String, String, String]),
+    __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload, mongoose_1.Types.ObjectId, String, String]),
     __metadata("design:returntype", void 0)
 ], WorkersController.prototype, "generatePdf", null);
 WorkersController = __decorate([

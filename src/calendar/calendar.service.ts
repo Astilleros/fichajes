@@ -139,10 +139,10 @@ export class CalendarService {
     return response.data;
   }
 
-  async getChanges(calendarId: string, updatedMin: string) {
+  async getChanges(calendarId: string, updatedMin: Date) {
     const options: calendar_v3.Params$Resource$Events$List = {
       calendarId,
-      updatedMin,
+      updatedMin: updatedMin.toISOString(),
       singleEvents: false,
       showDeleted: false,
       showHiddenInvitations: false,

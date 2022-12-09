@@ -32,11 +32,8 @@ let UserService = class UserService {
         return await this.userModel.findOne({ _id: id });
     }
     async update(id, updateUserDto) {
-        const update = Object.assign({}, updateUserDto);
-        if (update.password)
-            update.password = await this.encript.hashUserPassword(update.password);
         return await this.userModel
-            .findOneAndUpdate({ _id: id }, update, { new: true })
+            .findOneAndUpdate({ _id: id }, updateUserDto, { new: true })
             .lean();
     }
     async remove(id) {

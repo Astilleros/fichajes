@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateFileDto } from './dto/create-file.dto';
 import { Files, FilesDocument } from './entities/files.entity';
 
@@ -16,7 +16,7 @@ export class FilesService {
     return `https://ficfac.app/api/files/${file?._id}`;
   }
 
-  async findById(_id: string) {
+  async findById(_id: Types.ObjectId) {
     const file = await this.FilesModel.findOne({ _id }).exec();
     if (!file) return file;
 

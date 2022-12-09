@@ -21,30 +21,30 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
-/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import { Types } from 'mongoose';
 export declare class TasksController {
     private readonly tasksService;
     constructor(tasksService: TasksService);
     create(user: JwtPayload, createTaskDto: CreateTaskDto): Promise<import("./entities/task.entity").TaskDocument>;
     findAll(user: JwtPayload): Promise<import("./entities/task.entity").TaskDocument[]>;
-    findOne(user: JwtPayload, id: string): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    findOne(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    update(user: JwtPayload, id: string, updateTaskDto: UpdateTaskDto): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    update(user: JwtPayload, _id: Types.ObjectId, updateTaskDto: UpdateTaskDto): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    remove(user: JwtPayload, id: string): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    remove(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    addWorker(user: JwtPayload, id: string, worker_id: string): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    addWorker(user: JwtPayload, _id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
+        _id: Types.ObjectId;
     }>;
-    deleteWorker(user: JwtPayload, id: string, worker_id: string): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
-        _id: import("mongoose").Types.ObjectId;
+    deleteWorker(user: JwtPayload, _id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/task.entity").TaskDocument> & import("./entities/task.entity").Task & Document & {
+        _id: Types.ObjectId;
     }>;
 }

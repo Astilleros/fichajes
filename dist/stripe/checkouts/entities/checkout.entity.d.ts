@@ -21,13 +21,13 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
-/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
+import { HydratedDocument, Types } from 'mongoose';
 import Stripe from 'stripe';
 import { CheckoutStatus } from './status.enum';
-export type CheckoutDocument = Checkout & Document;
+export type CheckoutDocument = HydratedDocument<Checkout>;
 export declare class Checkout {
-    readonly user: string;
+    readonly user: Types.ObjectId;
     readonly createdAt: Date;
     checkout: Stripe.Checkout.Session;
     status: CheckoutStatus;

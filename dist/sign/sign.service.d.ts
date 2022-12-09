@@ -22,14 +22,16 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateSignDto } from './dto/create-sign.dto';
 import { Sign, SignDocument } from './entities/sign.entity';
 export declare class SignService {
     private SignModel;
     constructor(SignModel: Model<SignDocument>);
     create(data: CreateSignDto): Promise<Sign>;
-    findById(_id: string): Promise<Sign & import("mongoose").Document<any, any, any> & {
-        _id: import("mongoose").Types.ObjectId;
-    }>;
+    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Sign> & Sign & {
+        _id: Types.ObjectId;
+    } & Required<{
+        _id: Types.ObjectId;
+    }>>;
 }

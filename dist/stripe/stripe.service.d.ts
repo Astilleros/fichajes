@@ -36,12 +36,16 @@ export declare class StripeService {
     private stripe;
     private webhook_secret;
     constructor(cfg: ConfigService, CheckoutsService: CheckoutsService, UserService: UserService);
-    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
         _id: import("mongoose").Types.ObjectId;
-    }>;
-    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, CheckoutDocument> & import("./checkouts/entities/checkout.entity").Checkout & Document & {
+    } & Required<{
         _id: import("mongoose").Types.ObjectId;
-    })[]>;
+    }>>;
+    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
+        _id: import("mongoose").Types.ObjectId;
+    } & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }>)[]>;
     webhook(sig: string, body: any): Promise<void>;
     createOrder(session: Stripe.Checkout.Session, checkout_db: CheckoutDocument): Promise<void>;
     fulfillOrder(session: Stripe.Checkout.Session, checkout_db: CheckoutDocument): Promise<void>;

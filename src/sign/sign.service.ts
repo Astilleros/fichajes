@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateSignDto } from './dto/create-sign.dto';
 import { Sign, SignDocument } from './entities/sign.entity';
 
@@ -13,7 +13,7 @@ export class SignService {
     return await file.save();
   }
 
-  async findById(_id: string) {
+  async findById(_id: Types.ObjectId) {
     return await this.SignModel.findOne({ _id }).exec();
   }
 }

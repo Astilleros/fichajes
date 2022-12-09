@@ -47,12 +47,13 @@ export class CalendarController {
       await this.workersService.watchEvent(worker, e);
     }
     if(!last_updated) last_updated = new Date(worker.sync).getTime()
+
     const sync = new Date(last_updated).toISOString();
-    console.log('5- new sync from date: ', sync);
-    await this.workersService.update(worker.user, worker._id, {
+    await this.workersService._setInternal(worker._id, {
       sync,
       locked: false,
     });
+    console.log('5- new sync from date: ', sync);
   }
 
   @Get('list')
