@@ -25,18 +25,13 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { RawBodyRequest } from '@nestjs/common';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import { Checkout } from './checkouts/entities/checkout.entity';
 import { StripeService } from './stripe.service';
 export declare class StripeController {
     private readonly stripeService;
     constructor(stripeService: StripeService);
-    list(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
-        _id: import("mongoose").Types.ObjectId;
-    } & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }>)[]>;
-    create(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
-        _id: import("mongoose").Types.ObjectId;
-    } & Required<{
+    list(user: JwtPayload): Promise<Checkout[]>;
+    create(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>>;
     webhook(req: RawBodyRequest<Request>): Promise<void>;

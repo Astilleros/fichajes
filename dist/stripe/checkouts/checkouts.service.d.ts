@@ -29,24 +29,16 @@ import { Checkout, CheckoutDocument } from './entities/checkout.entity';
 export declare class CheckoutsService {
     private readonly CheckoutModel;
     constructor(CheckoutModel: Model<CheckoutDocument>);
-    create(createCheckoutDto: CreateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
-        _id: Types.ObjectId;
-    } & Required<{
+    create(createCheckoutDto: CreateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & Required<{
         _id: Types.ObjectId;
     }>>;
-    findOne(session_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findOne(session_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & Required<{
         _id: Types.ObjectId;
     }>>;
-    findAll(user_id: Types.ObjectId): Promise<(import("mongoose").Document<unknown, any, Checkout> & Checkout & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findAll(user_id: Types.ObjectId): Promise<(import("mongoose").Document<unknown, any, Checkout> & Checkout & Required<{
         _id: Types.ObjectId;
     }>)[]>;
-    update(_id: Types.ObjectId, updateCheckoutDto: UpdateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & {
-        _id: Types.ObjectId;
-    } & Required<{
+    update(_id: Types.ObjectId, updateCheckoutDto: UpdateCheckoutDto): Promise<import("mongoose").Document<unknown, any, Checkout> & Checkout & Required<{
         _id: Types.ObjectId;
     }>>;
     remove(_id: Types.ObjectId): Promise<import("mongodb").DeleteResult>;

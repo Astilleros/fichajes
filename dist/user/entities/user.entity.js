@@ -17,7 +17,6 @@ const ExposeId_decorator_1 = require("../../core/decorators/ExposeId.decorator")
 let User = class User {
 };
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId }),
     (0, ExposeId_decorator_1.ExposeId)(),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], User.prototype, "_id", void 0);

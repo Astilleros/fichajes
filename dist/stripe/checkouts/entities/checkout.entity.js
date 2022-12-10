@@ -12,12 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckoutSchema = exports.Checkout = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const ExposeId_decorator_1 = require("../../../core/decorators/ExposeId.decorator");
 const stripe_1 = require("stripe");
 const status_enum_1 = require("./status.enum");
 let Checkout = class Checkout {
 };
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, ExposeId_decorator_1.ExposeId)(),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Checkout.prototype, "_id", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User', required: true }),
+    (0, ExposeId_decorator_1.ExposeId)(),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Checkout.prototype, "user", void 0);
 __decorate([

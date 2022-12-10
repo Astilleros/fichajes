@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const AuthUser_decorator_1 = require("../auth/decorators/AuthUser.decorator");
 const jwtPayload_dto_1 = require("../auth/dto/jwtPayload.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const MongooseClassSerializer_interceptor_1 = require("../core/interceptors/MongooseClassSerializer.interceptor");
+const checkout_entity_1 = require("./checkouts/entities/checkout.entity");
 const stripe_service_1 = require("./stripe.service");
 let StripeController = class StripeController {
     constructor(stripeService) {
@@ -35,14 +37,16 @@ let StripeController = class StripeController {
 __decorate([
     (0, common_1.Get)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseInterceptors)((0, MongooseClassSerializer_interceptor_1.default)(checkout_entity_1.Checkout)),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], StripeController.prototype, "list", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseInterceptors)((0, MongooseClassSerializer_interceptor_1.default)(checkout_entity_1.Checkout)),
     __param(0, (0, AuthUser_decorator_1.AuthUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [jwtPayload_dto_1.JwtPayload]),

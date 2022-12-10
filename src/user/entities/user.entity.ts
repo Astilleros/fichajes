@@ -10,7 +10,7 @@ export type UserDocument = HydratedDocument<User>;
   versionKey: false,
 })
 export class User {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  //@Prop({ type: mongoose.Schema.Types.ObjectId })
   @ExposeId()
   _id: Types.ObjectId;
 

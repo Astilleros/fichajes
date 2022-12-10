@@ -50,9 +50,11 @@ export class WorkersService {
       user: user._id, 
       mode: workerModes.none,
       calendar: calendar.id,
-      private_calendar: private_calendar.id,
+      private_calendar: private_calendar.id
     }
+    
     return await this.workerModel.create(worker);
+    
   }
 
   async findAll(user: JwtPayload): Promise<WorkerDocument[]> {

@@ -18,7 +18,6 @@ const status_enum_1 = require("../dto/status.enum");
 let Worker = class Worker {
 };
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId }),
     (0, ExposeId_decorator_1.ExposeId)(),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Worker.prototype, "_id", void 0);

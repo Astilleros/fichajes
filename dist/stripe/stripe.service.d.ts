@@ -36,14 +36,10 @@ export declare class StripeService {
     private stripe;
     private webhook_secret;
     constructor(cfg: ConfigService, CheckoutsService: CheckoutsService, UserService: UserService);
-    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
-        _id: import("mongoose").Types.ObjectId;
-    } & Required<{
+    createCheckout(user: JwtPayload): Promise<import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>>;
-    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & {
-        _id: import("mongoose").Types.ObjectId;
-    } & Required<{
+    listCheckouts(user: JwtPayload): Promise<(import("mongoose").Document<unknown, any, import("./checkouts/entities/checkout.entity").Checkout> & import("./checkouts/entities/checkout.entity").Checkout & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>)[]>;
     webhook(sig: string, body: any): Promise<void>;

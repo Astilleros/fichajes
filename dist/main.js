@@ -11,7 +11,9 @@ async function bootstrap() {
         origin: ['*', 'ficfac.app', 'www.ficfac.app', 'http://localhost:4200'],
     });
     app.setGlobalPrefix('api');
-    app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true }));
+    app.useGlobalPipes(new common_1.ValidationPipe({
+        whitelist: true,
+    }));
     await app.listen(3000);
 }
 bootstrap();

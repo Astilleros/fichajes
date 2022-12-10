@@ -9,7 +9,7 @@ export type WorkerDocument = HydratedDocument<Worker>;
 
 @Schema({ versionKey: false })
 export class Worker {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  //@Prop({ type: mongoose.Schema.Types.ObjectId })
   @ExposeId()
   _id: Types.ObjectId;
 
