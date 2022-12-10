@@ -12,14 +12,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignSchema = exports.Sign = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const ExposeId_decorator_1 = require("../../core/decorators/ExposeId.decorator");
 let Sign = class Sign {
 };
 __decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId }),
+    (0, ExposeId_decorator_1.ExposeId)(),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Sign.prototype, "_id", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'User', required: true }),
+    (0, ExposeId_decorator_1.ExposeId)(),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Sign.prototype, "user", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId, ref: 'Worker', required: true }),
+    (0, ExposeId_decorator_1.ExposeId)(),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Sign.prototype, "worker", void 0);
 __decorate([

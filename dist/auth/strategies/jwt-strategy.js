@@ -13,6 +13,7 @@ exports.JwtStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("mongoose");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
         super({
@@ -22,7 +23,11 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         });
     }
     async validate(user) {
-        return { _id: user._id, username: user.username, email: user.email };
+        return {
+            _id: new mongoose_1.Types.ObjectId(user._id),
+            username: user.username,
+            email: user.email,
+        };
     }
 };
 JwtStrategy = __decorate([

@@ -31,42 +31,49 @@ export class WorkersService {
     private SignService: SignService,
   ) { }
 
-  async create(user: JwtPayload,  createWorkerDto: CreateWorkerDto): Promise<ListWorkerDto> {
-    const createdWorker = new this.workerModel({user: user._id, mode: workerModes.none, ...createWorkerDto});
+  async create(user: JwtPayload,  createWorkerDto: CreateWorkerDto): Promise<WorkerDocument> {
 
     const calendar = await this.calendarService.createCalendar({
-      summary: `FicFac: ${createdWorker.name}`,
-      description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
+      summary: `FicFac: ${createWorkerDto.name}`,
+      description: `Calendario creado por FicharFacil para el trabajador ${createWorkerDto.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
       timeZone: 'Europe/Madrid',
     });
 
     const private_calendar = await this.calendarService.createCalendar({
-      summary: `*FicFac*: ${createdWorker.name}`,
-      description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aquí se registraran los eventos mientras este en modo comando. `,
+      summary: `*FicFac*: ${createWorkerDto.name}`,
+      description: `Calendario creado por FicharFacil para el trabajador ${createWorkerDto.name}. Aquí se registraran los eventos mientras este en modo comando. `,
       timeZone: 'Europe/Madrid',
     });
-    createdWorker.calendar = calendar.id;
-    createdWorker.private_calendar = private_calendar.id;
-    await createdWorker.save();
-    return createdWorker.toObject();
+
+    const worker = {
+      ... createWorkerDto,
+      user: user._id, 
+      mode: workerModes.none,
+      calendar: calendar.id,
+      private_calendar: private_calendar.id,
+    }
+    return await this.workerModel.create(worker);
   }
 
-  async findAll(user: JwtPayload): Promise<ListWorkerDto[]> {
+  async findAll(user: JwtPayload): Promise<WorkerDocument[]> {
     const workers: WorkerDocument[] = await this.workerModel
       .find({ user: user._id })
       .exec();
     return workers;
   }
+
   async filterEvents(
     user: JwtPayload,
     worker_id: Types.ObjectId,
     start: string,
     end: string,
   ): Promise<calendar_v3.Schema$Event[]> {
+    
     const w: WorkerDocument = await this.workerModel
-      .findOne({ _id: worker_id, user: user._id })
+      .findOne({ _id: worker_id, user: user._id  })
       .exec();
     if (!w) throw new Error('Trabajador no encontrado');
+
     const events = await this.calendarService.filterEvents(
       w.calendar,
       start,

@@ -11,14 +11,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const class_transformer_1 = require("class-transformer");
+const ExposeId_decorator_1 = require("../../core/decorators/ExposeId.decorator");
 let User = class User {
 };
 __decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.default.Schema.Types.ObjectId }),
+    (0, ExposeId_decorator_1.ExposeId)(),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], User.prototype, "_id", void 0);
+__decorate([
+    (0, class_transformer_1.Exclude)(),
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ select: false }),
+    (0, class_transformer_1.Exclude)(),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
@@ -62,7 +72,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "sede", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: null, nullable: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], User.prototype, "licensedUntil", void 0);
 User = __decorate([

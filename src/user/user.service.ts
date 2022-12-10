@@ -14,13 +14,16 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const user = { ...createUserDto };
-    user.password = await this.encript.hashUserPassword(user.password);
-    return await this.userModel.create(user);
+    const user = {
+      ...createUserDto,
+      password: await this.encript.hashUserPassword(createUserDto.password),
+    };
+    const response = await this.userModel.create(user);
+    return response;
   }
 
-  async findOne(id: Types.ObjectId): Promise<UserDocument> {
-    return await this.userModel.findOne({ _id: id });
+  findOne(id: Types.ObjectId): Promise<UserDocument> {
+    return this.userModel.findOne({ _id: id }).exec();
   }
 
   async update(

@@ -38,21 +38,18 @@ let WorkersService = class WorkersService {
         this.SignService = SignService;
     }
     async create(user, createWorkerDto) {
-        const createdWorker = new this.workerModel(Object.assign({ user: user._id, mode: mode_enum_1.workerModes.none }, createWorkerDto));
         const calendar = await this.calendarService.createCalendar({
-            summary: `FicFac: ${createdWorker.name}`,
-            description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
+            summary: `FicFac: ${createWorkerDto.name}`,
+            description: `Calendario creado por FicharFacil para el trabajador ${createWorkerDto.name}. Aqui registrará cada periodo trabajado mediante un evento. `,
             timeZone: 'Europe/Madrid',
         });
         const private_calendar = await this.calendarService.createCalendar({
-            summary: `*FicFac*: ${createdWorker.name}`,
-            description: `Calendario creado por FicharFacil para el trabajador ${createdWorker.name}. Aquí se registraran los eventos mientras este en modo comando. `,
+            summary: `*FicFac*: ${createWorkerDto.name}`,
+            description: `Calendario creado por FicharFacil para el trabajador ${createWorkerDto.name}. Aquí se registraran los eventos mientras este en modo comando. `,
             timeZone: 'Europe/Madrid',
         });
-        createdWorker.calendar = calendar.id;
-        createdWorker.private_calendar = private_calendar.id;
-        await createdWorker.save();
-        return createdWorker.toObject();
+        const worker = Object.assign(Object.assign({}, createWorkerDto), { user: user._id, mode: mode_enum_1.workerModes.none, calendar: calendar.id, private_calendar: private_calendar.id });
+        return await this.workerModel.create(worker);
     }
     async findAll(user) {
         const workers = await this.workerModel

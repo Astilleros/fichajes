@@ -17,9 +17,11 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const update_user_dto_1 = require("./dto/update-user.dto");
+const user_entity_1 = require("./entities/user.entity");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const AuthUser_decorator_1 = require("../auth/decorators/AuthUser.decorator");
 const jwtPayload_dto_1 = require("../auth/dto/jwtPayload.dto");
+const MongooseClassSerializer_interceptor_1 = require("../core/interceptors/MongooseClassSerializer.interceptor");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -72,6 +74,7 @@ __decorate([
 ], UserController.prototype, "remove", null);
 UserController = __decorate([
     (0, common_1.Controller)('user'),
+    (0, common_1.UseInterceptors)((0, MongooseClassSerializer_interceptor_1.default)(user_entity_1.User)),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 exports.UserController = UserController;

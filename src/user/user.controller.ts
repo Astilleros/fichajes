@@ -6,6 +6,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,8 +15,10 @@ import { User } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthUser } from '../auth/decorators/AuthUser.decorator';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
+import MongooseClassSerializerInterceptor from 'src/core/interceptors/MongooseClassSerializer.interceptor';
 
 @Controller('user')
+@UseInterceptors(MongooseClassSerializerInterceptor(User))
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

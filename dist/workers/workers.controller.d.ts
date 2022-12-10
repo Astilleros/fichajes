@@ -27,35 +27,26 @@ import { CreateWorkerDto } from './dto/create-worker.dto';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { Types } from 'mongoose';
+import { Worker } from './entities/worker.entity';
 export declare class WorkersController {
     private readonly workersService;
     constructor(workersService: WorkersService);
-    create(user: JwtPayload, createWorkerDto: CreateWorkerDto): Promise<import("./dto/list-worker.dto").ListWorkerDto>;
-    findAll(user: JwtPayload): Promise<import("./dto/list-worker.dto").ListWorkerDto[]>;
+    create(user: JwtPayload, createWorkerDto: CreateWorkerDto): Promise<Worker>;
+    findAll(user: JwtPayload): Promise<Worker[]>;
     filterEvents(user: JwtPayload, worker_id: Types.ObjectId, start: string, end: string): Promise<import("googleapis").calendar_v3.Schema$Event[]>;
-    findOne(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/worker.entity").Worker> & import("./entities/worker.entity").Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findOne(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    update(user: JwtPayload, _id: Types.ObjectId, updateWorkerDto: UpdateWorkerDto): Promise<import("mongoose").Document<unknown, any, import("./entities/worker.entity").Worker> & import("./entities/worker.entity").Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    update(user: JwtPayload, _id: Types.ObjectId, updateWorkerDto: UpdateWorkerDto): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    remove(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/worker.entity").Worker> & import("./entities/worker.entity").Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    remove(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    shareCalendar(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/worker.entity").Worker> & import("./entities/worker.entity").Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    shareCalendar(user: JwtPayload, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    unshareCalendar(user: JwtPayload, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/worker.entity").Worker> & import("./entities/worker.entity").Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    unshareCalendar(user: JwtPayload, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
     generatePdf(user: JwtPayload, worker_id: Types.ObjectId, start: string, end: string): Promise<any>;

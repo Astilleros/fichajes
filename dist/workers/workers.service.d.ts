@@ -26,7 +26,6 @@ import { calendar_v3 } from 'googleapis';
 import { Model, Types } from 'mongoose';
 import { JwtPayload } from 'src/auth/dto/jwtPayload.dto';
 import { CalendarService } from 'src/calendar/calendar.service';
-import { ListWorkerDto } from './dto/list-worker.dto';
 import { workerStatus } from './dto/status.enum';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Worker, WorkerDocument } from './entities/worker.entity';
@@ -44,17 +43,13 @@ export declare class WorkersService {
     private CheckinService;
     private SignService;
     constructor(workerModel: Model<WorkerDocument>, calendarService: CalendarService, FilesService: FilesService, userService: UserService, CheckinService: CheckinService, SignService: SignService);
-    create(user: JwtPayload, createWorkerDto: CreateWorkerDto): Promise<ListWorkerDto>;
-    findAll(user: JwtPayload): Promise<ListWorkerDto[]>;
+    create(user: JwtPayload, createWorkerDto: CreateWorkerDto): Promise<WorkerDocument>;
+    findAll(user: JwtPayload): Promise<WorkerDocument[]>;
     filterEvents(user: JwtPayload, worker_id: Types.ObjectId, start: string, end: string): Promise<calendar_v3.Schema$Event[]>;
-    findOne(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findOne(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    update(user_id: Types.ObjectId, _id: Types.ObjectId, updateWorkerDto: UpdateWorkerDto): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    update(user_id: Types.ObjectId, _id: Types.ObjectId, updateWorkerDto: UpdateWorkerDto): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
     _setInternal(_id: Types.ObjectId, internal: {
@@ -62,30 +57,20 @@ export declare class WorkersService {
         status?: workerStatus;
         sync?: string;
     }): Promise<Worker>;
-    remove(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    remove(user_id: Types.ObjectId, _id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    shareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    shareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    unshareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    unshareCalendar(user_id: Types.ObjectId, worker_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
-    changeMode(user_id: Types.ObjectId, worker_id: Types.ObjectId, new_mode: workerModes): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    changeMode(user_id: Types.ObjectId, worker_id: Types.ObjectId, new_mode: workerModes): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
     generatePdfToSign(jwt: JwtPayload, worker_id: Types.ObjectId, start: string, end: string): Promise<any>;
-    getWorkerByCalendar(calendar: string): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & {
-        _id: Types.ObjectId;
-    } & Required<{
+    getWorkerByCalendar(calendar: string): Promise<import("mongoose").Document<unknown, any, Worker> & Worker & Required<{
         _id: Types.ObjectId;
     }>>;
     watchEvent(worker: WorkerDocument, e: calendar_v3.Schema$Event): Promise<void | calendar_v3.Schema$Event | (import("mongoose").Document<unknown, any, import("../checkin/entities/checkin.entity").Checkin> & import("../checkin/entities/checkin.entity").Checkin & {

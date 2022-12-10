@@ -24,12 +24,12 @@ let UserService = class UserService {
         this.encript = encript;
     }
     async create(createUserDto) {
-        const user = Object.assign({}, createUserDto);
-        user.password = await this.encript.hashUserPassword(user.password);
-        return await this.userModel.create(user);
+        const user = Object.assign(Object.assign({}, createUserDto), { password: await this.encript.hashUserPassword(createUserDto.password) });
+        const response = await this.userModel.create(user);
+        return response;
     }
-    async findOne(id) {
-        return await this.userModel.findOne({ _id: id });
+    findOne(id) {
+        return this.userModel.findOne({ _id: id }).exec();
     }
     async update(id, updateUserDto) {
         return await this.userModel

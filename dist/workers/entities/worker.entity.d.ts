@@ -3,6 +3,7 @@ import { workerModes } from '../dto/mode.enum';
 import { workerStatus } from '../dto/status.enum';
 export type WorkerDocument = HydratedDocument<Worker>;
 export declare class Worker {
+    _id: Types.ObjectId;
     user: Types.ObjectId;
     name: string;
     dni: string;

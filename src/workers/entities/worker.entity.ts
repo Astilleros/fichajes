@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsMongoId } from 'class-validator';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { ExposeId } from 'src/core/decorators/ExposeId.decorator';
 import { workerModes } from '../dto/mode.enum';
 import { workerStatus } from '../dto/status.enum';
 
@@ -7,7 +9,12 @@ export type WorkerDocument = HydratedDocument<Worker>;
 
 @Schema({ versionKey: false })
 export class Worker {
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @ExposeId()
+  _id: Types.ObjectId;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  @ExposeId()
   user: Types.ObjectId;
 
   @Prop({

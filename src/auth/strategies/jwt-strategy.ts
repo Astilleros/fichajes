@@ -2,7 +2,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { JwtPayload } from '../dto/jwtPayload.dto';
-
+import { User } from 'src/user/entities/user.entity';
+import { Types } from 'mongoose';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
@@ -14,7 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(user: any): Promise<JwtPayload> {
-    return { _id: user._id, username: user.username, email: user.email };
+  async validate(user: User): Promise<JwtPayload> {
+    return {
+      _id: new Types.ObjectId(user._id),
+      username: user.username,
+      email: user.email,
+    };
   }
 }

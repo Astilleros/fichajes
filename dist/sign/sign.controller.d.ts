@@ -29,9 +29,7 @@ export declare class SignController {
     private readonly signService;
     constructor(signService: SignService);
     create(createSignDto: CreateSignDto): Promise<import("./entities/sign.entity").Sign>;
-    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/sign.entity").Sign> & import("./entities/sign.entity").Sign & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, import("./entities/sign.entity").Sign> & import("./entities/sign.entity").Sign & Required<{
         _id: Types.ObjectId;
     }>>;
 }

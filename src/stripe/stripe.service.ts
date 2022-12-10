@@ -105,7 +105,6 @@ export class StripeService {
   ) {
     console.log('Fulfilling order', session);
     // EMAIL DE PAGO RECIBIDO
-    // SUMAR 1 año A LA SUBSCRIPCION
     const user = await this.UserService.findOne(checkout_db.user);
     if (!user.licensedUntil) {
       user.licensedUntil = new Date();

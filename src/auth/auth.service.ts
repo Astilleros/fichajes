@@ -17,7 +17,6 @@ export class AuthService {
     if (!user) return null;
     const valid = await this.encrip.comparePasswords(pass, user.password);
     if (!valid) return null;
-    user.password = '';
     return user;
   }
 
@@ -29,7 +28,6 @@ export class AuthService {
     };
     return {
       access_token: this.jwtService.sign(payload),
-      user,
     };
   }
 }

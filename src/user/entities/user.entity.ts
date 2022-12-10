@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Exclude } from 'class-transformer';
+import { ExposeId } from 'src/core/decorators/ExposeId.decorator';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -8,11 +10,17 @@ export type UserDocument = HydratedDocument<User>;
   versionKey: false,
 })
 export class User {
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @ExposeId()
+  _id: Types.ObjectId;
+
+  @Exclude()
   @Prop({ required: true })
   readonly username: string;
 
-  @Prop({ select: false })
-  password: string;
+  @Exclude()
+  @Prop()
+  readonly password: string;
 
   @Prop({ required: true })
   readonly nombre: string;
@@ -44,7 +52,7 @@ export class User {
   @Prop({ required: true })
   readonly sede: string;
 
-  @Prop({ default: null, nullable: true })
-  licensedUntil: Date | null;
+  @Prop()
+  licensedUntil?: Date;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

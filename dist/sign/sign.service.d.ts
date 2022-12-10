@@ -29,9 +29,7 @@ export declare class SignService {
     private SignModel;
     constructor(SignModel: Model<SignDocument>);
     create(data: CreateSignDto): Promise<Sign>;
-    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Sign> & Sign & {
-        _id: Types.ObjectId;
-    } & Required<{
+    findById(_id: Types.ObjectId): Promise<import("mongoose").Document<unknown, any, Sign> & Sign & Required<{
         _id: Types.ObjectId;
     }>>;
 }

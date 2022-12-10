@@ -1,6 +1,7 @@
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 export type SignDocument = HydratedDocument<Sign>;
 export declare class Sign {
+    readonly _id: Types.ObjectId;
     readonly user: Types.ObjectId;
     readonly worker: Types.ObjectId;
     readonly file: string;

@@ -27,7 +27,6 @@ let AuthService = class AuthService {
         const valid = await this.encrip.comparePasswords(pass, user.password);
         if (!valid)
             return null;
-        user.password = '';
         return user;
     }
     async generateAccessToken(user) {
@@ -38,7 +37,6 @@ let AuthService = class AuthService {
         };
         return {
             access_token: this.jwtService.sign(payload),
-            user,
         };
     }
 };
